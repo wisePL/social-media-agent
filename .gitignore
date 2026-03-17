@@ -1,0 +1,10 @@
+# Credentials - never commit
+.env
+
+# Logs
+*.log
+agent.log
+
+# OS
+.DS_Store
+Thumbs.db

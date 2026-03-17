@@ -1,0 +1,84 @@
+{
+  "_comment": "Verse Eight Marketing Pipeline — Agent 순서 및 핸드오프 정의",
+
+  "name": "verse8-marketing-pipeline",
+  "version": "1.0.0",
+
+  "notion": {
+    "datasource_id": "2bfed889-905f-8105-9313-000bb0f90cb5",
+    "template_id": "2bfed889-905f-8100-af78-c527d8069f47",
+    "calendar_db": "https://www.notion.so/2bfed889905f815f8954dfec194f8a2c"
+  },
+
+  "social": {
+    "twitter_handle": "@Verse_Eight",
+    "discord_server": "discord.gg/verse8-official"
+  },
+
+  "agents": [
+    {
+      "id": "01-content-planner",
+      "skill": "01-content-planner/SKILL.md",
+      "description": "노션 페이지 생성 + 스케줄 등록",
+      "phase": "immediate",
+      "triggers": ["new announcement", "새 공지"],
+      "outputs": ["notion_page_id", "notion_page_url", "publish_datetime"],
+      "status_after": "In progress"
+    },
+    {
+      "id": "02-copy-writer",
+      "skill": "02-copy-writer/SKILL.md",
+      "description": "트윗 + 디스코드 카피 작성",
+      "phase": "immediate",
+      "depends_on": "01-content-planner",
+      "inputs": ["notion_page_id", "notion_page_url"],
+      "status_after": "Copy Done | Design WIP"
+    },
+    {
+      "id": "03-image-guide",
+      "skill": "03-image-guide/SKILL.md",
+      "description": "디자이너용 그래픽 요청서",
+      "phase": "immediate",
+      "depends_on": "02-copy-writer",
+      "pause_after": true,
+      "pause_reason": "디자이너 작업 대기 — Status를 READY로 변경 시 재개",
+      "status_after": "Copy Done | Design WIP"
+    },
+    {
+      "id": "04-publisher",
+      "skill": "04-publisher/SKILL.md",
+      "description": "Twitter + Discord 발행",
+      "phase": "scheduled",
+      "trigger_condition": "Status == READY",
+      "trigger_time": "publish_datetime",
+      "task_id_prefix": "publish-",
+      "status_after": "LIVE"
+    },
+    {
+      "id": "05-analytics",
+      "skill": "05-analytics/SKILL.md",
+      "description": "24h 후 성과 분석",
+      "phase": "scheduled",
+      "trigger_time": "publish_datetime + 24h",
+      "task_id_prefix": "analytics-",
+      "depends_on": "04-publisher",
+      "status_after": "Done"
+    }
+  ],
+
+  "status_flow": [
+    "Not started",
+    "In progress",
+    "Copy Done | Design WIP",
+    "Approval",
+    "READY",
+    "LIVE",
+    "Done"
+  ],
+
+  "omc_modes": {
+    "full_pipeline": "team: ORCHESTRATOR.md 기반으로 공지 파이프라인 실행",
+    "retry_publish": "ralph: 발행 재시도",
+    "autonomous": "autopilot: 완전 자동 파이프라인 (확인 없이)"
+  }
+}
