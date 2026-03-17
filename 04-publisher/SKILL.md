@@ -88,7 +88,7 @@ Status가 READY가 아닌 경우:
 
 ### Step 3 — Twitter/X 발행
 
-Tags에 `Verse8 twitter` 또는 `Vibe Twitter`가 포함된 경우 실행.
+기본적으로 항상 실행. (@Verse_Eight 계정으로 항상 발행)
 
 #### 이미지 있는 경우
 ```bash
@@ -135,7 +135,7 @@ twitter_url: https://x.com/Verse_Eight/status/[tweet_id]
 
 ### Step 4 — Discord 발행
 
-Tags에 `discord`가 포함된 경우 실행.
+기본적으로 항상 실행.
 
 #### 채널 결정 (우선순위 순)
 | 조건 | 사용 웹훅 | 비고 |
