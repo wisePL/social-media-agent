@@ -154,8 +154,6 @@ announcement_type에 따라 올바른 필러 & 톤 결정:
 [After: Verse8으로 어떻게 달라지는지]
 
 [Bridge: 지금 바로 할 수 있는 행동 + CTA]
-
-#Verse8 #Agent8 #[커스텀태그]
 ```
 
 예시:
@@ -165,8 +163,6 @@ Building a game used to take a team and 6 months.
 Now it takes one prompt and 3 minutes.
 
 verse8.io — start tonight.
-
-#Verse8 #Agent8 #AICreation
 ```
 
 **파트너십 발표 (PAS: Problem→Agitate→Solution)**
@@ -176,8 +172,6 @@ verse8.io — start tonight.
 [Agitate: 그 고통의 결과/심각성 증폭]
 
 [Solution: 파트너십이 어떻게 해결하는지 + CTA]
-
-#Verse8 #[파트너태그]
 ```
 
 예시 (Base 파트너십):
@@ -188,8 +182,6 @@ That's the old Web3.
 
 Base x Verse8 — everything you create is onchain, remixable, yours.
 verse8.io/base
-
-#Verse8 #Base #OnchainGaming
 ```
 
 **이벤트 / 게임잼 / 챌린지**
@@ -203,8 +195,6 @@ verse8.io/base
 🔗 [참여 방법]
 
 [링크]
-
-#Verse8 #[이벤트태그]
 ```
 
 **AMA / Engagement**
@@ -217,8 +207,6 @@ Drop your questions below 👇
 or join us live on Discord.
 
 discord.gg/verse8-official
-
-#Verse8 #AMA
 ```
 
 **Reply Guy 형식 (X Community 태그)**
@@ -237,7 +225,7 @@ Made [관련 게임/콘텐츠] in [N]mins on Verse8 btw.
 - Hook이 첫 줄에 있어야 함 (read-more 전에 핵심)
 - CTA 또는 링크 반드시 포함
 - 이모지: 0-3개 (남용 금지)
-- 해시태그: 2-4개 (트윗 끝에)
+- 해시태그: **사용 금지** (트윗에 해시태그 절대 넣지 않음)
 - "We're excited to announce"로 시작 금지
 - 수동태 최소화, 능동적 문장
 
@@ -252,7 +240,7 @@ Made [관련 게임/콘텐츠] in [N]mins on Verse8 btw.
 [4/7] 증거/사례 — 수치, 결과, 데모 링크
 [5/7] 솔루션 공개 — Verse8이 어떻게 해결하는지
 [6/7] 실행 방법 — 구체적 단계 or 시작하는 법
-[7/7] CTA + 링크 + 해시태그 ("RT if this changes how you think about building.")
+[7/7] CTA + 링크 ("RT if this changes how you think about building.")
 ```
 
 **Open Loop 연결 문구 예시:**
@@ -273,15 +261,20 @@ RT 유도 > Reply 유도 > Bookmark 유도 > Like 유도
 
 #### 기본 구조 (영어로 작성)
 
+> ⚠️ **Discord 작성 규칙:**
+> - `---` 디바이더(수평선) **사용 금지**
+> - 멘션은 항상 `@everyone` 고정
+> - `#support` 등 채널 링크 멘션 **사용 금지**
+
 **커뮤니티 대상 (친근한 톤)**
 ```markdown
+@everyone
+
 # 📣 [공지 제목]
 
 [한 줄 훅 — 커뮤니티가 신경 써야 할 이유]
 
----
-
-## 🔥 뭐가 달라지나요?
+## 🔥 What's new?
 
 **[포인트 1]**
 [설명 1-2문장]
@@ -292,31 +285,23 @@ RT 유도 > Reply 유도 > Bookmark 유도 > Like 유도
 **[포인트 3]**
 [설명 1-2문장]
 
----
-
-## 📅 언제?
+## 📅 When?
 
 > [날짜/시간 KST]
-> [추가 세부 정보]
 
----
-
-## 🔗 링크
+## 🔗 Links
 
 - 🌐 [공식 링크]([URL])
 - 🐦 [트위터]([tweet URL])
-
----
-*질문은 [#support] 채널에서!*
 ```
 
-**공식 / 파트너십 발표 (영문 포함)**
+**공식 / 파트너십 발표**
 ```markdown
+@everyone
+
 # 🤝 [파트너십 제목]
 
 We're building [X] with [파트너명].
-
----
 
 ## What this means for creators
 
@@ -329,59 +314,44 @@ We're building [X] with [파트너명].
 **For the ecosystem:**
 - [영향 1]
 
----
-
 ## Learn More
 
 → [링크 1]
 → [링크 2]
-
----
-*[MENTION] Check the full thread on X 🐦*
 ```
 
 **이벤트 공지 (게임잼 / 챌린지)**
 ```markdown
+@everyone
+
 # 🎮 [이벤트명]
 
 [한 줄 흥미 유발 문장]
 
----
+## 🏆 Prizes
 
-## 🏆 상금 / 보상
-
-| 순위 | 보상 |
-|------|------|
+| Rank | Prize |
+|------|-------|
 | 1st | [보상] |
 | 2nd | [보상] |
 | Community Pick | [보상] |
 
----
-
-## 📋 참여 방법
+## 📋 How to participate
 
 1. [단계 1]
 2. [단계 2]
 3. [단계 3]
 
----
+## ⏰ Timeline
 
-## ⏰ 타임라인
+| Date | Event |
+|------|-------|
+| [날짜] | Start |
+| [날짜] | Deadline |
+| [날짜] | Winners announced |
 
-| 날짜 | 내용 |
-|------|------|
-| [날짜] | 시작 |
-| [날짜] | 마감 |
-| [날짜] | 수상자 발표 |
-
----
-
-> 🔗 자세히 보기: [링크]
-
-*[MENTION] Let's build. 🔥*
+> 🔗 [링크]
 ```
-
-**`[MENTION]` 플레이스홀더:** 담당자가 @everyone, @here, 또는 특정 역할 멘션으로 대체
 
 ### Step 5 — 7 Sweeps 카피 정제 (Copy-Editing)
 
@@ -528,12 +498,12 @@ verse8.io — start tonight.
 ### Base 파트너십 공지
 - 강조: 즉시 배포, 온체인 소유권, 분산화
 - 언급: Base 생태계, Brian Armstrong 언급 가능
-- 태그: `#Base` `#BasedOnchain`
+- 해시태그 사용 금지 (트위터 규칙 동일 적용)
 
 ### Story Protocol 파트너십 공지
 - 강조: IP 소유권, Spin system, 크리에이터 수익
 - 언급: @StoryProtocol, SY LEE 관련 시 언급 가능
-- 태그: `#StoryProtocol` `#IPOwnership`
+- 해시태그 사용 금지
 
 ### Kaito / 마인드쉐어 관련
 - 강조: 창작자 생태계, 야퍼(Yapper) 활동
@@ -551,8 +521,6 @@ verse8.io — start tonight.
 Turned it into a playable game in 3 minutes.
 
 [게임 링크]
-
-#Verse8
 ```
 
 **타겟 프로필:**
