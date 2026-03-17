@@ -147,36 +147,21 @@ twitter_url: https://x.com/Verse_Eight/status/[tweet_id]
 | `X AMA` tag | DISCORD_WEBHOOK_AMA | AMA 이벤트 |
 | 기본값 | DISCORD_WEBHOOK_ANNOUNCEMENTS | 기본 공지 채널 |
 
-#### Discord Webhook 발행
+#### Discord Webhook 발행 (plain text only)
+> ⚠️ embed 형식 사용 금지. `content` 필드에 plain text만 전송.
+
+**이미지 없는 경우:**
 ```bash
 curl -X POST "[DISCORD_WEBHOOK_URL]" \
   -H "Content-Type: application/json" \
-  -d '{
-    "content": "[discord_content]",
-    "embeds": [{
-      "image": {"url": "[design_output_image_url]"}
-    }]
-  }'
+  -d '{"content": "[discord_content]"}'
 ```
 
-#### Discord Embed 형식 (풍부한 포맷)
-```json
-{
-  "content": "[멘션: @everyone 또는 빈값]",
-  "embeds": [
-    {
-      "title": "[공지 제목]",
-      "description": "[discord_content 본문]",
-      "color": 5814783,
-      "image": {"url": "[이미지 URL if available]"},
-      "footer": {
-        "text": "Verse Eight | verse8.io",
-        "icon_url": "[Verse Eight 로고 URL]"
-      },
-      "timestamp": "[publish_datetime ISO-8601]"
-    }
-  ]
-}
+**이미지 있는 경우 — 파일 첨부:**
+```bash
+curl -X POST "[DISCORD_WEBHOOK_URL]" \
+  -F 'payload_json={"content": "[discord_content]"}' \
+  -F "file=@[image_file]"
 ```
 
 #### 발행 결과 저장
