@@ -239,11 +239,7 @@ Task Details, Tweet, Discord Announcement 섹션 내용 확인.
 **🎨 Graphic Request**
 
 **공지 제목:** [title]
-**납기 기한:** [publish_datetime - 24시간]
-**담당 디자이너:** [DESIGN BY 필드값]
 **공지 유형:** [파트너십 / 이벤트 / 패치노트 / AMA / 커뮤니티]
-
----
 
 ### 📐 필요한 에셋
 
@@ -338,13 +334,7 @@ Status는 변경하지 않음 (READY 상태 유지 — 02-copy-writer가 이미 
   • Twitter 메인 이미지: 1600×900px (PNG/JPG)
   • Discord 공지 이미지: 1280×720px (PNG)
 
-납기 기한: [publish_datetime - 24시간]
-담당 디자이너: [designer]
-
-➡️ 디자이너가 Design output 섹션에 업로드하면,
-   담당자가 검토 후 Status를 'Approval'로 변경하고
-   최종 승인 시 'READY'로 변경해주세요.
-   그러면 Publisher 에이전트가 자동으로 발행합니다.
+➡️ 디자인 완료 후 Design output 섹션에 업로드하면 @publish 로 즉시 발행 가능합니다.
 ```
 
 ---
@@ -390,12 +380,10 @@ Status는 변경하지 않음 (READY 상태 유지 — 02-copy-writer가 이미 
 - [ ] 공지 유형이 명확히 식별되었는가?
 - [ ] 모든 에셋 크기와 포맷이 명시되어 있는가?
 - [ ] 텍스트 오버레이 내용이 구체적인가? (헤드라인 15자 이내 체크)
-- [ ] 납기 기한이 발행 시간보다 24시간 이상 전인가?
 - [ ] 비주얼 방향성 (무드, 색상, 효과)이 구체적으로 기술되었는가?
 - [ ] Midjourney 프롬프트가 포함되어 있는가?
 - [ ] 브랜드 가이드/레퍼런스 링크가 있는가?
 - [ ] Design output 섹션 업로드 안내가 포함되어 있는가?
-- [ ] 디자이너 연락처/담당자가 명시되어 있는가?
 - [ ] 이미지 필요 여부 판단이 완료되었는가? (텍스트 전용 발행 고려)
 
 ---
@@ -406,7 +394,7 @@ Status는 변경하지 않음 (READY 상태 유지 — 02-copy-writer가 이미 
 Twitter의 경우 이미지 없이도 발행 가능. 이 경우:
 - Graphic Request에 "텍스트 전용 발행 — 이미지 불필요" 명시
 - 이유 기재 (긴급성, 단순 공지 등)
-- Status를 "Copy Done | Design WIP" → 바로 "Approval"로 올릴 수 있음을 알림
+- Graphic Request에 "텍스트 전용 발행 — 이미지 불필요" 명시
 
 ### 기존 템플릿 사용
 이미 만들어진 이미지 템플릿(Figma 등)이 있는 경우:
@@ -424,10 +412,8 @@ Twitter의 경우 이미지 없이도 발행 가능. 이 경우:
 
 ## 핸드오프
 
-이 에이전트는 파이프라인을 **일시 정지**시킵니다.
-디자이너의 작업이 완료되고 Design output에 업로드 후,
-담당자가 수동으로 Status를 **READY**로 변경하면
-Publisher 에이전트가 활성화됩니다.
+이미지 가이드 작성 완료 후 Status는 **READY** 유지.
+디자이너가 Design output에 이미지 업로드 후 노션 댓글에 `@publish` 달면 즉시 발행.
 
 ---
 
