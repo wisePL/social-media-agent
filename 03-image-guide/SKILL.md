@@ -324,7 +324,7 @@ page_id: [page_id]
 Graphic Request callout 내용 업데이트
 ```
 
-Status는 변경하지 않음 (이미 "Copy Done | Design WIP" 상태).
+Status는 변경하지 않음 (READY 상태 유지 — 02-copy-writer가 이미 READY로 설정함).
 
 ### Step 6 — 결과 보고
 
