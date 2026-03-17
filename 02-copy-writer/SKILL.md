@@ -538,14 +538,68 @@ Turned it into a playable game in 3 minutes.
 > 이 섹션은 매월 1일 `05-analytics` 에이전트가 `memory/marketing-insights.md` 데이터를 기반으로 자동 업데이트합니다.
 > 카피 작성 전 반드시 이 섹션을 참고하세요.
 
-### 📈 고성과 패턴 (Engagement Rate 상위)
-_[analytics 에이전트가 채움 — 초기값 없음, 첫 공지 발행 후 자동 생성]_
+### 📈 고성과 패턴 (실제 3개월 데이터 기반, 2025-12-18~2026-03-17)
+
+**1위 — Agent8 2.0 발표 (6.94% eng rate)**
+```
+Say Hello to Agent8 2.0! Thinks bigger. Builds longer. Never stops.
+[기능 3줄 요약]
+Try now → verse8.io
+```
+패턴: 메이저 업데이트 + 의인화된 짧은 훅 + CTA
+
+**2위 — CROSS Game Jam 마감 임박 (6.15% eng rate, 24K imp)**
+```
+The Verse8 × CROSS Game Jam is in its final stretch.
+You've got the IP. You've got the tools.
+150,000 $CROSS (~$20k USD) is waiting.
+Vibecode & submit your game before time runs out. 🕹️ [링크] [이미지]
+```
+패턴: 긴박감 + 구체적 $ 수치 + "You've got" 임파워먼트
+
+**3위 — "You can build it for free." (5.77% eng rate)**
+```
+You can build it for free. Try here → [링크] [영상]
+```
+패턴: 극단적으로 짧음 + Zero Risk CTA + 영상
+
+**4위 — Creators Guild $10K (3.50% eng rate, 36K imp)**
+```
+Creators, this one's for you.
+The Verse8 Creators Guild is now open to all.
+Get a chance to earn from a $10,000 reward pool.
+Apply here 👇 [링크] [이미지]
+```
+패턴: 직접 호칭 + 구체적 $ + 명확한 CTA
+
+**5위 — Vibe coding 대비 (반전훅, 25K+ imp)**
+```
+Manual coding vs vibe coding.
+Guess which one shipped faster. [영상]
+```
+패턴: 2줄 대비 + 독자 참여 유도
+
+---
 
 ### 📉 저성과 반례 (피해야 할 패턴)
-_[analytics 에이전트가 채움]_
 
-### 💡 현재 적용 중인 개선 인사이트
-_[analytics 에이전트가 채움 — 예: "파트너십 공지는 PAS > BAB 성과 (eng rate +1.2%p)"]_
+- **쓰레드 개별 트윗**: "TypeScript support, Built-in testing..." → 891 imp. 단독 트윗으로 맥락 없음.
+- **로지스틱스 위주**: "9 AM UTC tomorrow. We're going live to break down..." → 5,946 imp. 훅 없음.
+- **기술 상세 나열**: 불릿 포인트 4개 + 링크만 → 8K 이하 imp.
+- **Corporate 발표체**: "We are pleased to..." 스타일 → 완전 금지.
+
+---
+
+### 💡 현재 적용 중인 개선 인사이트 (2026-03-17 기준)
+
+- **이벤트/Game Jam 공지** → 4Us 프레임워크 최고 (3%~6% eng rate)
+- **제품 업데이트** → BAB 프레임워크 최고 (1.5%~2.5%)
+- **도발적 언어** ("Steal this", "Skill issue", "Even your mom can") → 임프레션 +20~30%
+- **영상 포함 시** 임프레션 2~4배 (텍스트 대비)
+- **"You can build it for free"** → Zero Risk CTA 단 한 줄이 5.77% eng rate 달성
+- **구체적 수치** (25K games, 3.5M users, $10K prize) → 신뢰도 + 소셜 증거 강화
+- **크리에이터 이름 태그** → 해당 크리에이터 팔로워 파급 효과
+- **"Vibecode"** 단어 자체가 Verse8 브랜드 훅으로 작동함 (자연스러운 제품 언급)
 
 ---
 
