@@ -53,6 +53,9 @@ TWITTER_ACCESS_SECRET=
 
 # Discord Webhook (단일 채널 — #major-announcement)
 DISCORD_WEBHOOK_ANNOUNCEMENTS=
+
+# Discord Webhook (테스트 채널 — 페이지 제목에 "Test" 포함 시 자동 사용)
+DISCORD_WEBHOOK_TEST=
 ```
 
 ---
@@ -134,13 +137,14 @@ twitter_url: https://x.com/Verse_Eight/status/[tweet_id]
 
 Tags에 `discord`가 포함된 경우 실행.
 
-#### 채널 결정 (Tags 기반)
-| Tags 값 | 사용 웹훅 | 비고 |
-|---------|-----------|------|
-| `community` | DISCORD_WEBHOOK_COMMUNITY | 커뮤니티 일반 |
-| `partners` | DISCORD_WEBHOOK_PARTNERS | 파트너 전용 |
-| `broadcast` | DISCORD_WEBHOOK_ANNOUNCEMENTS | 전체 공지 |
-| `X AMA` | DISCORD_WEBHOOK_AMA | AMA 이벤트 |
+#### 채널 결정 (우선순위 순)
+| 조건 | 사용 웹훅 | 비고 |
+|------|-----------|------|
+| 페이지 제목에 "Test" 포함 | DISCORD_WEBHOOK_TEST | **테스트 채널 — 최우선** |
+| `community` tag | DISCORD_WEBHOOK_COMMUNITY | 커뮤니티 일반 |
+| `partners` tag | DISCORD_WEBHOOK_PARTNERS | 파트너 전용 |
+| `broadcast` tag | DISCORD_WEBHOOK_ANNOUNCEMENTS | 전체 공지 |
+| `X AMA` tag | DISCORD_WEBHOOK_AMA | AMA 이벤트 |
 | 기본값 | DISCORD_WEBHOOK_ANNOUNCEMENTS | 기본 공지 채널 |
 
 #### Discord Webhook 발행
