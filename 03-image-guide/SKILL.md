@@ -66,6 +66,123 @@
 
 ---
 
+## 검증된 템플릿 카탈로그 (Notion 마케팅 캘린더 실제 발행 기반)
+
+> 아래 8개 템플릿은 실제 발행된 Verse8 포스트 분석으로 도출된 패턴입니다.
+> 공지 유형 결정 시 이 카탈로그를 우선 참조하세요.
+
+### 템플릿 1: Stats Card (성과/수치 인포그래픽)
+```
+용도: KPI 업데이트, 플랫폼 마일스톤, 리더보드 효과, 기능 성과
+예시: "30D Product Metrics" — +103% Session Time / +148% Game Play Time / +278% Build Time
+구조:
+  - 상단: 제목 헤드라인 (예: "What Happened After the Leaderboard Launch")
+  - 중단: 3개 박스 카드 — 각 [아이콘 + 수치(+N%) + 설명 라벨]
+  - 하단: verse8.io 푸터 + 브랜드 로고
+디자인 키: 박스마다 아이콘, 수치는 대형 볼드, 다크 배경 + 브랜드 액센트 컬러
+```
+
+### 템플릿 2: Game Mosaic (게임 스크린샷 그리드)
+```
+용도: 플랫폼 쇼케이스, "Built on Verse8", 게임 다양성 강조
+예시: "Built on Verse8" — 8개 이상의 실제 게임 스크린샷 그리드
+구조:
+  - 여러 게임 썸네일 그리드 (3×2, 4×2, 또는 자유 배치)
+  - 배경: 다크 Verse8 브랜드 배경
+  - 오버레이: "Built on Verse8" 또는 "X games created" 텍스트
+  - 로고: 우하단 또는 상단 중앙
+디자인 키: 게임 이미지들이 충분히 다양해야 함 (액션/퍼즐/아케이드 혼합). 여백 최소화.
+```
+
+### 템플릿 3: Broadcast Card (AMA/콜라보 공지)
+```
+용도: 팟캐스트, AMA, 라이브 세션, 1:1 인터뷰 공지
+예시: "Broadcast | One on One Ruthy" — KevinLee × Ruthy
+구조:
+  - 상단: Verse8 로고 (좌상단)
+  - 좌측: 이벤트 제목 + 설명 텍스트 (최대 2줄)
+  - 우측: 참여자 PFP (프로필 사진) 원형 크롭 나란히
+  - 하단: 날짜 / 시간 (UTC 기준)
+  - 배경: 다크 브랜드 배경 + 미묘한 텍스처
+디자인 키: 인물 사진이 핵심. 고화질 PFP 필수. 제목 좌/PFP 우 레이아웃.
+```
+
+### 템플릿 4: Platform UI Showcase (실제 UI 스크린샷)
+```
+용도: 신기능 하이라이트, 크리에이터 모집, UI 업데이트 공지
+예시: "Creator Scouting" — verse8.io/explore 실제 화면 캡처
+구조:
+  - 메인: 실제 verse8.io 또는 editor 화면 스크린샷 (클린 캡처)
+  - 오버레이: 최소한의 브랜드 배지 또는 텍스트 ("Verse8" 로고만)
+  - 소셜 증거: 통계 강조 (예: "1M+ plays")
+디자인 키: UI가 메인이므로 오버레이 최소화. 실제 상품 스크린샷이 신뢰도 높음.
+```
+
+### 템플릿 5: Transparent/Interactive (투명 게임 오버레이)
+```
+용도: 게임 데모, "Don't tap." 스타일, 인터랙티브 느낌 연출
+예시: "Transparent Effect" — 게임 인터페이스를 투명 PNG로 tweet에 삽입
+구조:
+  - 배경: 다크 또는 트위터 배경색과 혼합
+  - 게임 UI 요소를 투명 배경 PNG로 삽입
+  - 텍스트: 1-2단어 ("Don't tap.")
+디자인 키: 게임이 트위터 피드 위에 실제로 올라와 있는 느낌 연출. PNG 투명도 활용.
+```
+
+### 템플릿 6: Meme Format (밈 적용)
+```
+용도: 커뮤니티 공감 유발, 바이럴, 가벼운 참여 유도
+예시: "Losing Credits Meme" — Pablo "내가 멈춰야 할 것 같은데..." 밈 패러디
+구조:
+  - 바이럴 밈 포맷 (Pablo, Drake, expanding brain 등)에 Verse8 상황 대입
+  - 첫 패널: Verse8 브랜딩 (로고 또는 색상)
+  - 텍스트: 커뮤니티 언어, degen 톤
+디자인 키: 원본 밈과 90% 유사하게 → 즉시 인식. 브랜드는 살짝만 삽입.
+```
+
+### 템플릿 7: CTA Card (행동 유도 카드)
+```
+용도: 프로모션, 무료 크레딧, 크리에이터 프로그램 모집
+예시: "Claim Free Credits" — "Get Free Agent8 Credits" 카드
+구조:
+  - 배경: 다크 브랜드 배경 (그라디언트 또는 단색)
+  - 메인: 대형 헤드라인 텍스트 (2-4단어, 화면 가득)
+  - 서브: 1줄 설명
+  - 하단: 로고 + URL
+디자인 키: 텍스트가 70%+ 공간 차지. 이미지 최소화. 임팩트 > 정보량.
+```
+
+### 템플릿 8: Partnership Lockup (파트너십 로고 배치)
+```
+용도: 신규 파트너십, 통합 발표, 콜라보 공지
+예시: YGG Submission — YGG × Verse8 로고 배치
+구조:
+  - 양 브랜드 로고 동등 배치 (중앙 분할 또는 나란히)
+  - 연결 기호: "×" 또는 "+"
+  - 배경: 뉴트럴 다크 또는 두 브랜드 컬러 혼합 그라디언트
+  - 텍스트: 파트너 이름 + 1줄 설명 (선택)
+디자인 키: 로고 크기 동등하게. 배경이 두 브랜드 모두와 어울려야 함.
+```
+
+---
+
+### 템플릿 선택 가이드
+
+| 공지 유형 | 1순위 템플릿 | 2순위 |
+|-----------|-------------|-------|
+| 플랫폼 성과/KPI | Stats Card | 텍스트 전용 |
+| 신기능/업데이트 | Platform UI Showcase | Stats Card |
+| 게임 데모/쇼케이스 | Transparent/Interactive | Game Mosaic |
+| 플랫폼 빌드 실적 | Game Mosaic | Stats Card |
+| AMA/라이브 공지 | Broadcast Card | CTA Card |
+| 파트너십 발표 | Partnership Lockup | — |
+| 커뮤니티/바이럴 | Meme Format | Transparent |
+| 프로모션/CTA | CTA Card | Platform UI Showcase |
+| 게임잼/이벤트 | CTA Card + 이벤트 키비주얼 | Stats Card (결과 발표 시) |
+| 이벤트 리캡 | 실제 사진 (디자인 불필요) | — |
+
+---
+
 ## 플랫폼별 이미지 스펙 (2025 기준)
 
 ### Twitter/X
@@ -98,7 +215,9 @@
 
 ## 공지 유형별 비주얼 공식
 
-### 파트너십 발표
+> **템플릿 카탈로그 먼저 참조** — 위 "검증된 템플릿 카탈로그"에서 해당 유형 선택 후, 아래 세부 규칙 적용.
+
+### 파트너십 발표 → 템플릿 8 (Partnership Lockup)
 ```
 레이아웃: 중앙 분할 or 나란히
 - 양 브랜드 로고 동등한 크기로 배치
@@ -109,41 +228,59 @@
 - 색상: 양 브랜드 컬러를 조화롭게
 ```
 
-### 이벤트 / 캠페인
+### 이벤트 / 게임잼 → 템플릿 7 (CTA Card) + 이벤트 키비주얼
 ```
 레이아웃: 히어로 + 정보 계층
 - 메인: 이벤트 테마 키비주얼 (캐릭터 or 일러스트)
 - 상단: 이벤트명 (대형 헤드라인)
 - 하단: 날짜 / 보상 정보
 - 무드: 흥분감, 참여 유도, 에너제틱
-- 반드시 포함: 날짜·시간 (UTC 기준) + 주요 보상
+- 반드시 포함: 날짜·시간 (UTC 기준) + 주요 보상 ($ 금액 명시)
+결과 발표 시: Stats Card 활용 (250+ games submitted 등 수치 강조)
 ```
 
-### 패치노트 / 업데이트
+### 제품/기능 업데이트 → 템플릿 4 (Platform UI Showcase) 또는 1 (Stats Card)
 ```
+UI 업데이트: 실제 화면 스크린샷 메인 → 브랜드 오버레이 최소화
+기능 성과 발표: Stats Card — 수치 3개 박스 카드 구성
 레이아웃: 스플릿 or 카드 그리드
-- 메인: 새 기능/캐릭터 인게임 스크린샷 or 아트
 - 텍스트 오버레이: 버전명 + 핵심 변경사항 3개 불릿
 - 무드: 다이나믹, 인게임 분위기, 뭔가 바뀌었다는 느낌
 - 선택: 4장 그리드로 각 업데이트 항목 분리 표현
 ```
 
-### AMA / 커뮤니티 이벤트
+### AMA / Broadcast → 템플릿 3 (Broadcast Card)
 ```
-레이아웃: 인물 중심
-- 메인: 연사 사진 (있을 경우) 또는 브랜드 캐릭터
-- 텍스트: "AMA" 또는 이벤트명 + 날짜/시간 + 주제
+레이아웃: Verse8 로고 상단 + 제목 좌측 + 참여자 PFP 우측
+- 메인: 연사 PFP 원형 크롭 (고화질 필수)
+- 텍스트: 이벤트명 + 날짜/시간 + 주제 1줄
 - 무드: 친근하고 참여적, 커뮤니티 따뜻함
-- 추가: 연사 이름·역할 명시
+- 연사 이름·역할 명시
 ```
 
-### 일반 커뮤니티 공지
+### 게임 데모 / 신작 쇼케이스 → 템플릿 5 (Transparent) 또는 2 (Game Mosaic)
 ```
-레이아웃: 심플 텍스트 + 브랜드 요소
-- 배경: 브랜드 다크 + 미묘한 텍스처/노이즈
-- 텍스트: 핵심 메시지 (15자 이내 헤드라인)
-- 하단: 로고 + 해시태그
-- 무드: 정보 전달 + 브랜드 일관성
+단일 게임 하이라이트: Transparent 오버레이 ("Don't tap." 스타일)
+여러 게임 동시 쇼케이스: Game Mosaic 그리드
+- 게임 세계관 1-2줄 설명 + 플레이 링크 CTA
+- 크리에이터 이름 포함 시 더 높은 Engagement
+```
+
+### 커뮤니티 / 바이럴 → 템플릿 6 (Meme) 또는 텍스트 전용
+```
+레이아웃: 심플 텍스트 + 브랜드 요소 또는 밈 포맷
+- 밈: 바이럴 포맷에 Verse8 상황 대입 (Pablo, Drake 등)
+- 텍스트 전용: 1-2줄 짧은 훅만 (이미지 없이도 5%+ eng rate 가능)
+- 무드: degen 톤, 커뮤니티 언어
+```
+
+### 크리에이터 모집 / 프로모션 → 템플릿 7 (CTA Card)
+```
+레이아웃: 대형 헤드라인 카드
+- "Get Free Agent8 Credits" 또는 "Join Creator Program" 스타일
+- 배경: 다크 브랜드 + 그라디언트
+- 소셜 증거 포함 시: 실제 수치 (1M+ plays, 4K+ creators)
+- CTA: 명확한 URL 또는 행동 지침
 ```
 
 ---
@@ -165,24 +302,38 @@ V7은 자연어를 잘 이해하므로 키워드 나열보다 **자연어 문장
 
 ### Verse Eight 스타일 Midjourney 프롬프트 예시
 
+> 실제 발행된 Verse8 포스트 디자인 패턴 기반. DESIGN BY 항목 참고:
+> - "Verse8": 내부 디자인팀 제작 (Stats Card, Creator Scouting 등)
+> - "Surgence": 외부 에이전시 (Built on Verse8 등)
+
+**Stats Card 배경 (성과/KPI):**
+```
+Dark tech dashboard background for stats infographic, subtle grid texture overlay, deep space navy background, three floating glassmorphism card panels with glow effects, minimal UI elements, Verse Eight brand identity, clean and data-forward aesthetic --ar 16:9 --stylize 200 --v 7 --no text watermark clutter
+```
+
 **파트너십 배너:**
 ```
 Dark web3 partnership announcement banner, two glowing brand logos connected by electric arc, deep space background with subtle grid texture, cyan and purple gradient accents, glassmorphism overlay panels, cinematic lighting, ultra clean minimalist layout --ar 16:9 --stylize 300 --v 7
 ```
 
-**게임 캐릭터/이벤트 키비주얼:**
+**게임잼 이벤트 키비주얼:**
 ```
-Epic web3 gaming event key visual, futuristic warrior character wielding digital sword, dark neon environment, particle effects and volumetric light, playful but tech-forward energy, rich purple and cyan color palette, dramatic cinematic composition --ar 16:9 --stylize 500 --v 7
-```
-
-**커뮤니티 공지 배경:**
-```
-Minimalist dark tech background for social media announcement, subtle noise texture, glowing grid lines, deep navy to black gradient, small holographic UI elements floating, web3 aesthetic, clean negative space for text overlay --ar 16:9 --stylize 200 --v 7
+Epic web3 gaming event key visual, multiple pixel game characters in dynamic action poses, dark neon gaming environment, particle effects and volumetric light, playful but tech-forward energy, rich purple and cyan color palette, dramatic cinematic composition, prize pool announcement feel --ar 16:9 --stylize 500 --v 7
 ```
 
-**패치노트 히어로:**
+**CTA Card 배경 (크리에이터 모집/프로모션):**
 ```
-Web3 game update announcement visual, dynamic game screenshot integration, version number glowing in neon, three highlight cards floating with glassmorphism effect, dark background with energy particles, Verse Eight brand identity, fast and exciting feel --ar 16:9 --stylize 400 --v 7
+Minimalist dark branded background for social media CTA card, deep navy to black gradient, glowing border accent, subtle noise texture, bold typography space, Verse Eight vibe coding aesthetic, web3 creator energy, clean negative space for headline text --ar 16:9 --stylize 150 --v 7
+```
+
+**Broadcast Card 배경 (AMA/인터뷰):**
+```
+Dark branded podcast/broadcast announcement background, Verse Eight logo placement top-left, subtle geometric patterns, professional yet playful web3 aesthetic, space for two circular profile photo placements on right side, deep dark navy background with cyan accent elements --ar 16:9 --stylize 200 --v 7
+```
+
+**Game Mosaic 배경:**
+```
+Dark showcase background for game screenshots grid, deep space aesthetic, subtle grid lines, Verse Eight brand overlay space, minimal design to let game thumbnails be the hero, slight glassmorphism border effects for each game card --ar 16:9 --stylize 100 --v 7
 ```
 
 ### 브랜드 일관성 유지 파라미터
@@ -222,14 +373,28 @@ Task Details, Tweet, Discord Announcement 섹션 내용 확인.
 - AMA 키워드: AMA, ask, live, session
 
 ### Step 3 — 이미지 필요 여부 판단
-다음 경우 이미지 없이 텍스트 전용 발행 권장:
+
+**실제 성과 데이터 기반 (298개 트윗 분석):**
+- 텍스트 전용 + 짧은 훅: Eng Rate 5%+ 가능 ("You can build it for free." → 5.77%)
+- 이미지 포함: 임프레션은 높지만 eng rate는 낮을 수 있음
+- 게임플레이 영상: 임프레션 압도적으로 높음 (20K~79K) — 이미지보다 영상 우선
+- **결론: 이미지 퀄리티 낮으면 차라리 텍스트 전용**
+
+텍스트 전용 발행 권장:
 - 긴급 공지 (빠른 발행 > 이미지 품질)
 - 짧은 커뮤니티 업데이트 (150자 미만 단순 공지)
 - 기존 스레드 리플라이
+- "극단 축약" 훅 포스트 (1-2줄 + 링크만)
 
 이미지 필요한 경우:
 - 파트너십, 이벤트, 패치노트, 주요 마일스톤
 - 브랜드 인지도 캠페인
+- KPI/Stats 발표 (Stats Card 포맷)
+- 게임 쇼케이스 (Game Mosaic)
+- AMA/Broadcast 공지 (Broadcast Card)
+
+영상 우선 고려:
+- 게임 데모 포스트는 영상 > 이미지 > 텍스트 순으로 임프레션 효과적
 
 ### Step 4 — Graphic Request 작성
 
