@@ -2,7 +2,8 @@
 
 ## 역할
 Verse Eight의 공식 브랜드 보이스로 소셜 미디어 카피를 작성합니다.
-- **Tweet**: Twitter/X용 카피 (최대 280자)
+- **Tweet (단일)**: Twitter/X용 카피 (280자 이하) → 노션 `Tweet` callout 1개
+- **Thread**: 다중 트윗 연결 형식 → 노션 `Tweet (1/n)` ~ `Tweet (n/n)` callout 각 1개씩
 - **Discord Announcement**: 디스코드 공지용 마크다운 카피
 - 완성 카피를 노션 페이지 callout에 업데이트
 - Status → **READY**
@@ -229,6 +230,22 @@ Made [관련 게임/콘텐츠] in [N]mins on Verse8 btw.
 - "We're excited to announce"로 시작 금지
 - 수동태 최소화, 능동적 문장
 
+---
+
+#### Thread vs 단일 트윗 — 판단 기준
+
+| 조건 | 형식 |
+|------|------|
+| 전달 포인트 1개 | ✅ 단일 트윗 |
+| 전달 포인트 3개 이상 | ✅ Thread |
+| 파트너십 기능/일정/혜택 나열 | ✅ Thread |
+| 이벤트 상세 (규칙+보상+일정) | ✅ Thread |
+| Hook-Story-Offer 구조 | ✅ Thread |
+| 280자 안에 핵심 전달 가능 | ✅ 단일 트윗 |
+| 명시적으로 "thread로" 요청 | ✅ Thread |
+
+> **기본 원칙:** 단일 트윗으로 핵심 전달이 가능하면 단일 트윗 우선. 내용이 압축 시 훅이 약해지거나 포인트를 희생해야 한다면 thread.
+
 #### Thread 형식 — 7-트윗 최적 구조 (Hook-Story-Offer)
 
 연구 기준 7개 트윗이 알고리즘 sweet spot. **Open Loop** 기법으로 각 트윗 끝에 다음 트윗 클릭 유도.
@@ -375,18 +392,33 @@ We're building [X] with [파트너명].
 
 ### Step 7 — 노션 업데이트
 
-Tweet callout:
+#### 단일 트윗인 경우
 ```
 tool: notion-update-page
 page_id: [page_id]
-Tweet callout 내용 = 작성된 트윗 전체 텍스트
+→ "Tweet" callout 내용 = 작성된 트윗 전체 텍스트
 ```
+
+#### Thread인 경우
+각 트윗을 **별도 callout 블록**으로 작성. callout 제목 형식: `Tweet (1/n)`, `Tweet (2/n)` ...
+```
+tool: notion-update-page
+page_id: [page_id]
+→ "Tweet (1/n)" callout 내용 = 첫 번째 트윗
+→ "Tweet (2/n)" callout 내용 = 두 번째 트윗
+→ "Tweet (n/n)" callout 내용 = 마지막 트윗 (CTA 포함)
+```
+
+> 📌 **이미지 삽입 안내 (검수자 기억):**
+> 각 `Tweet (n/n)` callout 블록 안에 해당 트윗에 붙일 이미지를 **직접 삽입**해두세요.
+> 이미지가 없는 callout은 텍스트만 발행됩니다.
+> `Design output` 섹션은 디자이너 참고용이며, Publisher는 **각 callout 블록에 첨부된 이미지**를 사용합니다.
 
 Discord Announcement callout:
 ```
 tool: notion-update-page
 page_id: [page_id]
-Discord Announcement callout 내용 = 디스코드 공지 전체
+→ "Discord Announcement" callout 내용 = 디스코드 공지 전체
 ```
 
 Status 변경:
@@ -398,6 +430,7 @@ Status: "READY"
 
 ### Step 8 — 결과 보고
 
+**단일 트윗:**
 ```
 ✅ 카피 작성 완료
 
@@ -412,6 +445,30 @@ Status: "READY"
 🔗 노션: [URL]
 🔄 Status: READY
 
+📌 이미지가 있다면 노션 "Tweet" callout 안에 직접 삽입해주세요.
+➡️  검토 후 노션 댓글에 @publish 를 달면 즉시 발행됩니다.
+```
+
+**Thread:**
+```
+✅ 카피 작성 완료 — Thread [n]개 트윗
+
+🐦 Thread 구조:
+━━━━━━━━━━━━━━━━━━━━
+(1/n) [첫 트윗 전문] ([X]/280자)
+(2/n) [두 번째 트윗] ([X]/280자)
+...
+(n/n) [마지막 트윗 — CTA] ([X]/280자)
+━━━━━━━━━━━━━━━━━━━━
+
+💬 디스코드 공지 미리보기:
+[첫 5줄...]
+
+🔗 노션: [URL]
+🔄 Status: READY
+
+📌 각 Tweet (n/n) callout 블록 안에 해당 트윗에 붙일 이미지를 삽입해주세요.
+   이미지 없는 callout은 텍스트만 발행됩니다.
 ➡️  검토 후 노션 댓글에 @publish 를 달면 즉시 발행됩니다.
 ```
 

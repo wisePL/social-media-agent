@@ -33,9 +33,9 @@ prompt: "04-publisher/SKILL.md 실행. notion_page_id=[page_id]"
 **다음 조건이 모두 충족되어야 발행합니다:**
 
 1. ✅ 노션 Status가 **READY**인가?
-2. ✅ Tweet callout에 내용이 있는가?
+2. ✅ `Tweet` 또는 `Tweet (1/n)` callout에 내용이 있는가?
 3. ✅ Discord Announcement callout에 내용이 있는가?
-4. ✅ Design output에 이미지가 있거나 (텍스트 전용 발행 확인)?
+4. ✅ 이미지는 각 Tweet callout 블록 안에 첨부된 것 사용 (없으면 텍스트만 발행 — 정상)
 5. ✅ 발행 채널(Twitter/Discord)이 설정되어 있는가?
 
 **조건 미충족 시:** 발행을 중단하고 담당자에게 알림.
@@ -70,11 +70,22 @@ id: [notion_page_id]
 
 다음 내용 추출:
 - `status`: READY 여부 확인
-- `tweet_content`: Tweet callout 내용
 - `discord_content`: Discord Announcement callout 내용
 - `tags`: 채널 결정용
 - `date`: 발행 예정 시간
-- `design_output`: 이미지 첨부 여부
+
+**Tweet 형식 감지:**
+- 노션 페이지에서 callout 블록 제목 확인
+- `Tweet (1/n)` 형식 callout 존재 → **Thread 모드**
+- `Tweet` callout 1개만 존재 → **단일 트윗 모드**
+
+**Thread 모드:** `Tweet (1/n)`, `Tweet (2/n)` ... `Tweet (n/n)` 순서대로 추출
+- 각 callout의 텍스트 추출
+- 각 callout 블록 안에 첨부된 이미지 확인 (있으면 해당 트윗에 첨부)
+
+**단일 트윗 모드:** `Tweet` callout 1개
+- 텍스트 추출
+- callout 안 첨부 이미지 확인
 
 ### Step 2 — Status 검증
 
@@ -90,12 +101,17 @@ Status가 READY가 아닌 경우:
 
 기본적으로 항상 실행. (@Verse_Eight 계정으로 항상 발행)
 
-#### 이미지 있는 경우
-```bash
-# Twitter API v2 — 미디어 업로드 후 트윗
-POST https://upload.twitter.com/1.1/media/upload.json
-  media: [이미지 파일 또는 URL]
+---
 
+#### 단일 트윗 모드
+
+**이미지 있는 경우 (callout에 첨부된 이미지):**
+```bash
+# 1. 이미지 업로드
+POST https://upload.twitter.com/1.1/media/upload.json
+  media: [callout 첨부 이미지]
+
+# 2. 트윗 발행
 POST https://api.twitter.com/2/tweets
   {
     "text": "[tweet_content]",
@@ -103,34 +119,70 @@ POST https://api.twitter.com/2/tweets
   }
 ```
 
-#### 텍스트만 발행
+**텍스트만 (callout에 이미지 없음):**
 ```bash
 POST https://api.twitter.com/2/tweets
-  {
-    "text": "[tweet_content]"
-  }
+  { "text": "[tweet_content]" }
 ```
 
-**Thread인 경우:**
+---
+
+#### Thread 모드
+
+`Tweet (1/n)` ~ `Tweet (n/n)` callout을 순서대로 순차 발행.
+각 callout의 이미지 첨부 여부를 개별 확인.
+
 ```bash
-# 첫 번째 트윗
-POST /2/tweets → {"text": "[트윗1]"}
-# 이후 트윗 (reply_to)
-POST /2/tweets → {"text": "[트윗2]", "reply": {"in_reply_to_tweet_id": "[트윗1 ID]"}}
+# --- Tweet (1/n) ---
+# 이미지 있으면 먼저 업로드
+POST https://upload.twitter.com/1.1/media/upload.json → media_id_1
+
+# 첫 트윗 발행 (reply 없음)
+POST https://api.twitter.com/2/tweets
+  {
+    "text": "[Tweet (1/n) 내용]",
+    "media": {"media_ids": ["[media_id_1]"]}   ← 이미지 없으면 media 필드 생략
+  }
+→ 응답: tweet_id_1
+
+# --- Tweet (2/n) ---
+POST https://upload.twitter.com/1.1/media/upload.json → media_id_2  ← 이미지 있는 경우만
+
+POST https://api.twitter.com/2/tweets
+  {
+    "text": "[Tweet (2/n) 내용]",
+    "reply": {"in_reply_to_tweet_id": "[tweet_id_1]"},
+    "media": {"media_ids": ["[media_id_2]"]}   ← 이미지 없으면 생략
+  }
+→ 응답: tweet_id_2
+
+# --- Tweet (n/n) --- 동일 패턴 반복, 항상 직전 tweet_id에 reply
 ```
+
+> ⚠️ **순서 엄수:** 반드시 (1/n) → (2/n) → (n/n) 순으로 발행. 다음 트윗은 직전 응답의 tweet_id를 사용.
+
+---
 
 #### curl 형식 예시 (Bash 실행용)
 ```bash
+# 단일 트윗 (텍스트만)
 curl -X POST "https://api.twitter.com/2/tweets" \
   -H "Authorization: OAuth ..." \
   -H "Content-Type: application/json" \
   -d '{"text": "[tweet_content]"}'
+
+# Thread 두 번째 트윗
+curl -X POST "https://api.twitter.com/2/tweets" \
+  -H "Authorization: OAuth ..." \
+  -H "Content-Type: application/json" \
+  -d '{"text": "[tweet2]", "reply": {"in_reply_to_tweet_id": "[tweet_id_1]"}}'
 ```
 
 #### 발행 결과 저장
 ```
-twitter_tweet_id: [응답에서 추출]
-twitter_url: https://x.com/Verse_Eight/status/[tweet_id]
+twitter_tweet_id: [첫 번째 tweet_id — thread의 경우 1/n 트윗 ID]
+twitter_url: https://x.com/Verse_Eight/status/[tweet_id_1]
+twitter_thread_ids: [tweet_id_1, tweet_id_2, ...] ← thread인 경우만
 ```
 
 ### Step 4 — Discord 발행
