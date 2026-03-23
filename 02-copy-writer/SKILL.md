@@ -280,13 +280,11 @@ RT 유도 > Reply 유도 > Bookmark 유도 > Like 유도
 
 > ⚠️ **Discord 작성 규칙:**
 > - `---` 디바이더(수평선) **사용 금지**
-> - 멘션은 항상 `@everyone` 고정
+> - `@everyone`은 **맨 마지막 줄**에 고정 (내용 다 읽은 후 알림)
 > - `#support` 등 채널 링크 멘션 **사용 금지**
 
 **커뮤니티 대상 (친근한 톤)**
 ```markdown
-@everyone
-
 # 📣 [공지 제목]
 
 [한 줄 훅 — 커뮤니티가 신경 써야 할 이유]
@@ -310,12 +308,12 @@ RT 유도 > Reply 유도 > Bookmark 유도 > Like 유도
 
 - 🌐 [공식 링크]([URL])
 - 🐦 [트위터]([tweet URL])
+
+@everyone
 ```
 
 **공식 / 파트너십 발표**
 ```markdown
-@everyone
-
 # 🤝 [파트너십 제목]
 
 We're building [X] with [파트너명].
@@ -335,12 +333,12 @@ We're building [X] with [파트너명].
 
 → [링크 1]
 → [링크 2]
+
+@everyone
 ```
 
 **이벤트 공지 (게임잼 / 챌린지)**
 ```markdown
-@everyone
-
 # 🎮 [이벤트명]
 
 [한 줄 흥미 유발 문장]
@@ -368,6 +366,8 @@ We're building [X] with [파트너명].
 | [날짜] | Winners announced |
 
 > 🔗 [링크]
+
+@everyone
 ```
 
 ### Step 5 — 7 Sweeps 카피 정제 (Copy-Editing)
