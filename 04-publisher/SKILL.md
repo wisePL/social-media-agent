@@ -244,25 +244,26 @@ Status: "LIVE"
 발행 완료 후 **두 가지** 액션을 병렬 실행:
 
 #### A. Slack 팀 채널 알림
-```
-tool: slack_send_message
-channel: SLACK_TEAM_CHANNEL   ← 팀 공유 채널 (개인 DM 아님)
-text: |
-  🚀 *[공지 제목]* published!
+```bash
+# .env에서 토큰 로드
+source .env
 
-  🐦 Twitter: [twitter_url]
-  💬 Discord: #major-announcement
-
-  ⚡ *First 1-hour boost actions:*
-  → Reply to every comment immediately
-  → Ask team to RT
-  → Share in relevant communities
-
-  RT × 20 = 1 Like (algorithm weight)
-  First hour determines 60% of total reach.
+curl -s -X POST "https://slack.com/api/chat.postMessage" \
+  -H "Authorization: Bearer $SLACK_BOT_TOKEN" \
+  -H "Content-Type: application/json; charset=utf-8" \
+  -d "{
+    \"channel\": \"$SLACK_TEAM_CHANNEL\",
+    \"text\": \"🚀 *[공지 제목]* published!\n\n🐦 Twitter: [twitter_url]\n💬 Discord: #major-announcement\n\n⚡ *First 1-hour boost actions:*\n→ Reply to every comment immediately\n→ Ask team to RT\n→ Share in relevant communities\n\nRT × 20 = 1 Like (algorithm weight)\nFirst hour determines 60% of total reach.\"
+  }"
 ```
 
-오류 발생 시 개인 DM(`SLACK_NOTIFICATION_CHANNEL`)에도 알림 전송.
+오류 발생 시 개인 DM(`SLACK_NOTIFICATION_CHANNEL`)에도 동일한 curl로 전송:
+```bash
+curl -s -X POST "https://slack.com/api/chat.postMessage" \
+  -H "Authorization: Bearer $SLACK_BOT_TOKEN" \
+  -H "Content-Type: application/json; charset=utf-8" \
+  -d "{\"channel\": \"$SLACK_NOTIFICATION_CHANNEL\", \"text\": \"⛔ 발행 오류: [오류 내용]\"}"
+```
 
 #### B. Notion 대시보드 로그 업데이트
 발행 로그를 Marketing Ops Dashboard의 "Recent Publish Log" 테이블에 추가:

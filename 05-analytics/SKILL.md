@@ -83,9 +83,27 @@ id: [notion_page_id]
 LIVE 상태 + 발행 로그에서 tweet_id, discord_message_id 추출.
 
 ### Step 2 — Twitter 데이터 수집
+
+**tweet_id 확인:**
+노션 페이지 하단 `📊 발행 로그` 섹션에서 `twitter_url` 추출 → URL에서 tweet_id 파싱.
+```
+https://x.com/Verse_Eight/status/[tweet_id]  →  tweet_id = 마지막 숫자
+```
+
+**tweet_id가 없는 경우 (수동 발행된 포스트):**
+- Twitter 데이터를 `N/A (tweet_id 없음 — 발행 로그에 URL 추가 필요)` 로 표시
+- 분석을 중단하지 않고 Step 3~7 계속 진행 (Discord 데이터 + 인사이트 생성은 가능)
+- 노션 페이지에 다음 안내 추가:
+  ```
+  ⚠️ tweet_id 없음 — 노션 페이지 하단 발행 로그에 트위터 URL을 추가하면 재분석 가능합니다.
+  예: 📊 발행 로그 → 트위터: https://x.com/Verse_Eight/status/[ID]
+  ```
+
+**tweet_id가 있는 경우:**
 ```bash
-curl "https://api.twitter.com/2/tweets/[tweet_id]?tweet.fields=public_metrics,non_public_metrics,created_at" \
-  -H "Authorization: Bearer [TWITTER_BEARER_TOKEN]"
+source .env
+curl -s "https://api.twitter.com/2/tweets/[tweet_id]?tweet.fields=public_metrics,created_at" \
+  -H "Authorization: Bearer $TWITTER_BEARER_TOKEN"
 ```
 
 응답에서 다음 추출:
@@ -327,30 +345,36 @@ Engagement Rate가 올라갈 것이다.
 
 분석 완료 후 **Slack 팀 채널**(`SLACK_TEAM_CHANNEL`)에 리포트 전송:
 
+```bash
+source .env
+
+REPORT_TEXT="📊 *Verse Eight Weekly Marketing Report* ([MM/DD] - [MM/DD])
+
+📣 Posts: [N] this week | [±N vs last week]
+Avg Engagement Rate: [N%] ([±N%p vs benchmark])
+
+🏆 *Best Post*
+\"[Title]\" — Eng.Rate [N%] | RT [N] | Impressions [N]
+Hook: [pattern] | Framework: [name] | Time: [KST]
+
+📉 *Needs Improvement*
+\"[Title]\" — Eng.Rate [N%]
+Why: [1-line analysis]
+
+💡 *Top 3 Actions for Next Week*
+1. [action item]
+2. [action item]
+3. [action item]
+
+📄 Full report: https://www.notion.so/326ed889905f8113aed3e45747acc14a"
+
+curl -s -X POST "https://slack.com/api/chat.postMessage" \
+  -H "Authorization: Bearer $SLACK_BOT_TOKEN" \
+  -H "Content-Type: application/json; charset=utf-8" \
+  -d "{\"channel\": \"$SLACK_TEAM_CHANNEL\", \"text\": $(echo "$REPORT_TEXT" | python3 -c 'import json,sys; print(json.dumps(sys.stdin.read()))')}"
 ```
-tool: slack_send_message
-channel: SLACK_TEAM_CHANNEL
-text: |
-  📊 *Verse Eight Weekly Marketing Report* ([MM/DD] - [MM/DD])
 
-  📣 Posts: [N] this week | [±N vs last week]
-  Avg Engagement Rate: [N%] ([±N%p vs benchmark])
-
-  🏆 *Best Post*
-  "[Title]" — Eng.Rate [N%] | RT [N] | Impressions [N]
-  Hook: [pattern] | Framework: [name] | Time: [KST]
-
-  📉 *Needs Improvement*
-  "[Title]" — Eng.Rate [N%]
-  Why: [1-line analysis]
-
-  💡 *Top 3 Actions for Next Week*
-  1. [action item]
-  2. [action item]
-  3. [action item]
-
-  📄 Full report: https://www.notion.so/326ed889905f8113aed3e45747acc14a
-```
+> tweet_id 없는 포스트는 "N/A" 처리하고 리포트에 포함. Slack 전송은 데이터 유무와 관계없이 항상 실행.
 
 **리포트 후 Notion 업데이트 (2곳):**
 
@@ -427,7 +451,14 @@ SKILL.md 업데이트 제안 3가지를 작성하라.
 단, Verse8 브랜드 가이드 절대 원칙(SAY/DON'T SAY)은 변경 금지."
 ```
 
-→ 제안 내용을 Slack DM(`SLACK_NOTIFICATION_CHANNEL`)으로 전송, 팀 승인 후 수동 적용.
+→ 제안 내용을 아래 curl로 Slack DM(`SLACK_NOTIFICATION_CHANNEL`) 전송, 팀 승인 후 수동 적용:
+```bash
+source .env
+curl -s -X POST "https://slack.com/api/chat.postMessage" \
+  -H "Authorization: Bearer $SLACK_BOT_TOKEN" \
+  -H "Content-Type: application/json; charset=utf-8" \
+  -d "{\"channel\": \"$SLACK_NOTIFICATION_CHANNEL\", \"text\": \"[제안 내용]\"}"
+```
 (자동 적용 아님 — 브랜드 가이드 변경은 반드시 사람이 검토)
 
 ---
