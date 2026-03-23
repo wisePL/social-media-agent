@@ -45,12 +45,13 @@ SLACK_TEAM_CHANNEL     = "C09FWFU4ZQB"  ← 팀 공유 채널 (주간 리포트 
 /announce-analytics ← 성과 분석
 ```
 
-## OMC 사용법 (oh-my-claudecode)
+## 자동화 인프라 (GCP VM: verse8-agent, us-central1-a)
 ```
-team: 공지 파이프라인 실행 [공지 내용]
-ralph: 발행이 실패한 경우 자동 재시도
-autopilot: ORCHESTRATOR.md 기반 완전 자동 파이프라인
+00-comment-watcher  → cron */5 * * * *  (댓글 커맨드 감지 + 실행)
+git pull            → cron */10 * * * * (코드 최신화)
+05-analytics        → 로컬 실행 (수동 또는 /announce-analytics)
 ```
+> 로컬 Claude Code를 켜지 않아도 @start, @copy, @publish 등 노션 댓글 커맨드는 자동 처리됩니다.
 
 ## 환경 변수 (.env 파일 위치: 이 폴더)
 ```

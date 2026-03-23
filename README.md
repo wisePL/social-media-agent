@@ -36,10 +36,13 @@ marketing-agents/
 
 ### 템플릿 섹션 (callout 순서)
 1. **Task Details** — 공지 기본 정보 (내부용)
-2. **Tweet** — 트위터 카피 (최종본)
+2. **Tweet** — 단일 트윗 카피 (최종본) *또는* **Tweet (1/n) ~ Tweet (n/n)** — Thread 형식
 3. **Discord Announcement** — 디스코드 카피 (최종본)
 4. **Graphic Request** — 디자이너에게 전달할 이미지 브리프
-5. **Design output** — 디자이너 결과물 업로드 공간
+5. **Design output** — 디자이너 결과물 보관용 (발행에는 미사용)
+
+> 📌 **이미지 배치:** 발행에 사용할 이미지는 `Tweet` 또는 각 `Tweet (n/n)` callout 블록 **안에 직접 삽입**해야 합니다.
+> callout에 이미지가 없으면 텍스트만 발행됩니다.
 
 ### Status 워크플로우
 ```
