@@ -158,12 +158,11 @@ notion_page_id = [page_id]
 #### `@reschedule [datetime]`
 ```
 1. 노션 페이지 fetch → 현재 Status 확인
-2. list_scheduled_tasks 에서 publish-[해당 페이지 ID 앞 8자리] 찾기
-   → 없으면 ⛔ 오류 회신 ("스케줄된 발행 태스크가 없습니다")
-3. update_scheduled_task(fireAt=[새 시간], enabled=true)  ← 취소됐던 것도 재활성화
-4. analytics 태스크도 새 시간 + 24h로 업데이트, enabled=true
-5. 노션 Date 필드 업데이트
-6. Status 처리:
+2. scheduled-publishes.json 에서 pageId 일치하는 항목 찾기
+   → 없으면 ⛔ 오류 회신 ("스케줄된 발행 항목이 없습니다")
+3. entry.publishAt = [새 시간 ISO], entry.status = "pending" 으로 업데이트
+4. 노션 Date 필드 업데이트
+5. Status 처리:
    - 현재 Status = CANCELLED  → READY 로 복구 (발행 재예약)
    - 현재 Status = READY       → 유지 (시간만 변경)
    - 현재 Status = In progress → 유지 (일정만 업데이트)
@@ -172,7 +171,7 @@ notion_page_id = [page_id]
 
 #### `@cancel`
 ```
-1. publish-, analytics- 스케줄드 태스크 enabled=false
+1. scheduled-publishes.json 에서 pageId 일치하는 entry.status = "cancelled" 로 변경
 2. 노션 Status → CANCELLED
 3. 회신 메시지에 복구 방법 안내:
    "다시 예약하려면 @reschedule [날짜시간] 커맨드를 사용하세요.
@@ -245,9 +244,9 @@ rich_text: 아래 형식
 
 ## 폴링 스케줄
 
-이 에이전트는 **5분마다** 자동 실행됩니다:
+이 에이전트는 **30분마다** 자동 실행됩니다:
 ```
-cron: */5 * * * *
+cron: 7,37 * * * *
 ```
 
 실행 시간이 짧을수록 좋습니다. 새 커맨드가 없으면 즉시 종료.

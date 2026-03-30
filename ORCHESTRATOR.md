@@ -76,32 +76,22 @@
 
 ### Phase 2: 스케줄 등록 (자동)
 
-```python
-# 04 Publisher 예약
-create_scheduled_task(
-  taskId=f"publish-{page_id[:8]}",
-  description=f"{title} 발행",
-  fireAt=publish_datetime,
-  prompt=f"""
-    04-publisher/SKILL.md 실행.
-    notion_page_id={page_id}
-    notion_page_url={page_url}
-    Status가 READY인 경우에만 발행 진행.
-  """
-)
+`scheduled-publishes.json` 에 항목 추가 (Claude 세션 종료 후에도 유지됨):
 
-# 05 Analytics 예약 (발행 후 24시간)
-create_scheduled_task(
-  taskId=f"analytics-{page_id[:8]}",
-  description=f"{title} 성과 분석",
-  fireAt=publish_datetime + 24h,
-  prompt=f"""
-    05-analytics/SKILL.md 실행.
-    notion_page_id={page_id}
-    24시간 경과 후 Twitter/Discord 성과 수집 및 노션 리포트 작성.
-  """
-)
+```json
+{
+  "pageId": "[notion_page_id]",
+  "title": "[title]",
+  "publishAt": "[publish_datetime ISO]",
+  "status": "pending"
+}
 ```
+
+**방법:** `scheduled-publishes.json` 파일을 읽어 schedules 배열에 위 항목을 추가하고 저장.
+GCP VM의 `check-and-publish.sh` (매시 정각 cron)이 이 파일을 읽어 시간이 된 항목을 자동 발행.
+
+> ⚠️ **절대 create_scheduled_task MCP 도구를 사용하지 않는다.**
+> Claude 세션 기반 scheduled task는 세션 종료 시 사라진다.
 
 ### Phase 3: 디자이너 대기 및 승인
 
@@ -122,11 +112,10 @@ create_scheduled_task(
 사용자: "발행 시간을 [새 시간]으로 바꿔줘"
 
 오케스트레이터:
-1. list_scheduled_tasks 에서 publish-[id] 찾기
-2. update_scheduled_task(taskId, fireAt=[새 시간])
-3. analytics-[id] 도 새 시간 + 24h로 업데이트
+1. scheduled-publishes.json 에서 pageId 일치 항목 찾기
+2. entry.publishAt = [새 시간 ISO] 로 업데이트
+3. entry.status = "pending" 으로 복구 (cancelled였으면)
 4. 노션 페이지 Date 필드도 업데이트
-5. GCal 이벤트 업데이트
 ```
 
 ### B. 발행 취소
@@ -134,9 +123,8 @@ create_scheduled_task(
 사용자: "취소해줘"
 
 오케스트레이터:
-1. update_scheduled_task(enabled=false) — publish, analytics 둘 다
+1. scheduled-publishes.json 에서 pageId 일치 항목의 status = "cancelled"
 2. 노션 Status → CANCELLED
-3. GCal 이벤트 삭제 (선택)
 ```
 
 ### C. 카피만 수정 (이미 작성된 경우)
@@ -217,12 +205,13 @@ create_scheduled_task(
 
 ---
 
-## 스케줄드 태스크 관리
+## 스케줄 관리
 
-현재 등록된 태스크 확인:
+현재 등록된 발행 일정 확인:
 ```
-tool: list_scheduled_tasks
-→ publish-, analytics- 로 시작하는 태스크들 확인
+scheduled-publishes.json 파일 읽기
+→ status: "pending" 항목들이 발행 예정 목록
+→ GCP VM check-and-publish.sh (매시 정각)이 자동 실행
 ```
 
 ---
