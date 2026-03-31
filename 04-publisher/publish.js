@@ -95,36 +95,83 @@ async function fetchPage(pageId) {
   const id = normalizeId(pageId);
   const [page, blocks] = await Promise.all([
     notionGet(`/v1/pages/${id}`),
-    notionGet(`/v1/blocks/${id}/children?page_size=50`),
+    notionGet(`/v1/blocks/${id}/children?page_size=100`),
   ]);
 
   const status = page.properties?.Status?.status?.name || '';
   const title = (page.properties?.Name?.title || []).map(t => t.plain_text).join('');
 
-  // callout 블록 맵핑
-  const callouts = {};
-  for (const b of (blocks.results || [])) {
-    if (b.type !== 'callout') continue;
-    const heading = (b.callout?.rich_text || []).map(t => t.plain_text).join('').trim();
-    callouts[heading] = b;
+  const allBlocks = blocks.results || [];
+
+  // ── 섹션 파싱 ──────────────────────────────────────────────────────────────
+  // 지원 구조 A: callout 블록 (has_children=true) → 자식 블록에서 내용 추출
+  // 지원 구조 B: quote/callout 헤딩 + flat 형제 블록 (구버전 호환)
+  // Tweet 스레드: "Tweet" 포함 heading 순서대로 tweetSections 배열에 누적
+  const NON_TWEET_KEYS = ['Instagram', 'Facebook', 'LinkedIn', 'Discord'];
+  const sections = {};       // channelKey → { siblingBlocks:[], calloutBlock:null }
+  const tweetSections = [];  // [{ siblingBlocks:[], calloutBlock:null }, ...]
+
+  let currentKey = null;
+  let currentTweetIdx = -1;
+
+  for (const b of allBlocks) {
+    let headingText = null;
+    if (b.type === 'quote') {
+      headingText = (b.quote?.rich_text || []).map(t => t.plain_text).join('').trim();
+    } else if (b.type === 'callout') {
+      headingText = (b.callout?.rich_text || []).map(t => t.plain_text).join('').trim();
+    }
+
+    if (headingText !== null) {
+      if (headingText.includes('Tweet')) {
+        // 새 트윗 섹션 추가 (스레드 순서 유지)
+        const sec = { siblingBlocks: [], calloutBlock: null };
+        if (b.type === 'callout' && b.has_children) sec.calloutBlock = b;
+        tweetSections.push(sec);
+        currentTweetIdx = tweetSections.length - 1;
+        currentKey = '__tweet__';
+        continue;
+      }
+      const matchedKey = NON_TWEET_KEYS.find(k => headingText.includes(k));
+      if (matchedKey) {
+        currentKey = matchedKey;
+        currentTweetIdx = -1;
+        if (!sections[currentKey]) sections[currentKey] = { siblingBlocks: [], calloutBlock: null };
+        if (b.type === 'callout' && b.has_children) sections[currentKey].calloutBlock = b;
+        continue;
+      }
+      // 비채널 헤딩 → 섹션 종료
+      currentKey = null;
+      currentTweetIdx = -1;
+    }
+
+    if (b.type === 'divider') { currentKey = null; currentTweetIdx = -1; continue; }
+
+    if (currentKey === '__tweet__' && currentTweetIdx >= 0) {
+      tweetSections[currentTweetIdx].siblingBlocks.push(b);
+    } else if (currentKey && currentKey !== '__tweet__') {
+      sections[currentKey].siblingBlocks.push(b);
+    }
   }
 
-  // 트윗 (단일 or 스레드)
-  const tweetBlocks = Object.entries(callouts)
-    .filter(([k]) => k === 'Tweet' || k.match(/^Tweet \(\d/))
-    .sort(([a], [b]) => a.localeCompare(b))
-    .map(([, v]) => v);
+  console.log('   tweets:', tweetSections.length, '| sections:', Object.keys(sections));
 
-  const discordBlock = callouts['Discord Announcement'];
+  // ── 섹션 내용 추출 ─────────────────────────────────────────────────────────
+  async function extractFromSection(section) {
+    if (!section) return null;
 
-  async function extractContent(block) {
-    if (!block) return null;
-    const ch = await notionGet(`/v1/blocks/${block.id}/children?page_size=50`);
+    let childBlocks = section.siblingBlocks;
+    if (section.calloutBlock) {
+      const ch = await notionGet(`/v1/blocks/${section.calloutBlock.id}/children?page_size=50`);
+      childBlocks = ch.results || [];
+    }
+    if (!childBlocks.length) return null;
+
     let text = '';
     let mediaUrl = null;
     let mediaType = null;
 
-    for (const c of (ch.results || [])) {
+    for (const c of childBlocks) {
       if (c.type === 'paragraph') {
         const t = (c.paragraph?.rich_text || []).map(r => {
           if (r.type === 'text') return r.text.content;
@@ -145,20 +192,21 @@ async function fetchPage(pageId) {
         if (!text.includes(c.bookmark.url)) text += (text ? '\n' : '') + c.bookmark.url;
       }
     }
-    return { text, mediaUrl, mediaType };
+    return (text || mediaUrl) ? { text, mediaUrl, mediaType } : null;
   }
 
-  const instagramBlock = callouts['Instagram'];
-  const facebookBlock  = callouts['Facebook'];
-  const linkedinBlock  = callouts['LinkedIn'];
-
-  const [tweetContents, discordContent, instagramContent, facebookContent, linkedinContent] = await Promise.all([
-    Promise.all(tweetBlocks.map(extractContent)),
-    discordBlock   ? extractContent(discordBlock)   : Promise.resolve(null),
-    instagramBlock ? extractContent(instagramBlock) : Promise.resolve(null),
-    facebookBlock  ? extractContent(facebookBlock)  : Promise.resolve(null),
-    linkedinBlock  ? extractContent(linkedinBlock)  : Promise.resolve(null),
+  const [tweetContentsRaw, discordContent, instagramContent, facebookContent, linkedinContent] = await Promise.all([
+    Promise.all(tweetSections.map(extractFromSection)),
+    extractFromSection(sections['Discord']),
+    extractFromSection(sections['Instagram']),
+    extractFromSection(sections['Facebook']),
+    extractFromSection(sections['LinkedIn']),
   ]);
+
+  // null 필터링 (내용 없는 트윗 제거)
+  const tweetContents = tweetContentsRaw.filter(Boolean);
+
+  console.log('   tweet(s):', tweetContents.length, '| discord:', !!discordContent?.text, '| ig:', !!instagramContent?.text, '| fb:', !!facebookContent?.text, '| li:', !!linkedinContent?.text);
 
   return { id, title, status, tweetContents, discordContent, instagramContent, facebookContent, linkedinContent };
 }
