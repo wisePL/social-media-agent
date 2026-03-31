@@ -398,7 +398,7 @@ async function main() {
     try {
       const sched = JSON.parse(fs.readFileSync(schedPath, 'utf8'));
       const entry = sched.schedules.find(s => s.pageId.replace(/-/g,'') === PAGE_ID.replace(/-/g,''));
-      if (entry) { entry.status = 'published'; entry.publishedAt = new Date().toISOString(); entry.twitterUrl = twitterUrl; }
+      if (entry) { entry.status = 'published'; entry.publishedAt = new Date().toISOString(); entry.twitterUrl = twitterUrl; entry.analyticsStatus = 'pending'; }
       fs.writeFileSync(schedPath, JSON.stringify(sched, null, 2));
     } catch (e) { console.warn('scheduled-publishes.json update skipped:', e.message); }
   }
