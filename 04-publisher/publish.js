@@ -148,12 +148,19 @@ async function fetchPage(pageId) {
     return { text, mediaUrl, mediaType };
   }
 
-  const [tweetContents, discordContent] = await Promise.all([
+  const instagramBlock = callouts['Instagram'];
+  const facebookBlock  = callouts['Facebook'];
+  const linkedinBlock  = callouts['LinkedIn'];
+
+  const [tweetContents, discordContent, instagramContent, facebookContent, linkedinContent] = await Promise.all([
     Promise.all(tweetBlocks.map(extractContent)),
-    discordBlock ? extractContent(discordBlock) : Promise.resolve(null),
+    discordBlock   ? extractContent(discordBlock)   : Promise.resolve(null),
+    instagramBlock ? extractContent(instagramBlock) : Promise.resolve(null),
+    facebookBlock  ? extractContent(facebookBlock)  : Promise.resolve(null),
+    linkedinBlock  ? extractContent(linkedinBlock)  : Promise.resolve(null),
   ]);
 
-  return { id, title, status, tweetContents, discordContent };
+  return { id, title, status, tweetContents, discordContent, instagramContent, facebookContent, linkedinContent };
 }
 
 // ── 미디어 다운로드 ───────────────────────────────────────────────────────────
@@ -313,6 +320,109 @@ async function slackPost(channel, text) {
   }, b);
 }
 
+// ── LinkedIn ──────────────────────────────────────────────────────────────────
+async function linkedinRegisterImageUpload(authorUrn, token) {
+  const body = JSON.stringify({
+    registerUploadRequest: {
+      recipes: ['urn:li:digitalmediaRecipe:feedshare-image'],
+      owner: authorUrn,
+      serviceRelationships: [{ relationshipType: 'OWNER', identifier: 'urn:li:userGeneratedContent' }],
+    },
+  });
+  const r = await httpreq({
+    hostname: 'api.linkedin.com', path: '/v2/assets?action=registerUpload', method: 'POST',
+    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json', 'X-Restli-Protocol-Version': '2.0.0', 'Content-Length': Buffer.byteLength(body) },
+  }, body);
+  if (r.status >= 400) throw new Error(`LinkedIn registerUpload: ${r.raw.slice(0, 300)}`);
+  const uploadUrl = r.body.value.uploadMechanism['com.linkedin.digitalmedia.uploading.MediaUploadHttpRequest'].uploadUrl;
+  const asset = r.body.value.asset;
+  return { uploadUrl, asset };
+}
+
+async function postLinkedIn(text, imageFilePath) {
+  const authorUrn = process.env.LINKEDIN_ORGANIZATION_URN;
+  const token = process.env.LINKEDIN_ACCESS_TOKEN;
+  if (!authorUrn || !token) throw new Error('LINKEDIN_ACCESS_TOKEN / LINKEDIN_ORGANIZATION_URN not set');
+
+  let mediaCategory = 'NONE';
+  let mediaArray;
+  if (imageFilePath) {
+    console.log('   LinkedIn image upload...');
+    const { uploadUrl, asset } = await linkedinRegisterImageUpload(authorUrn, token);
+    const imgData = fs.readFileSync(imageFilePath);
+    const u = new URL(uploadUrl);
+    await httpreq({ hostname: u.hostname, path: u.pathname + u.search, method: 'PUT', headers: { 'Content-Type': 'image/jpeg', 'Content-Length': imgData.length } }, imgData);
+    mediaCategory = 'IMAGE';
+    mediaArray = [{ status: 'READY', media: asset }];
+  }
+
+  const postBody = JSON.stringify({
+    author: authorUrn,
+    lifecycleState: 'PUBLISHED',
+    specificContent: {
+      'com.linkedin.ugc.ShareContent': {
+        shareCommentary: { text },
+        shareMediaCategory: mediaCategory,
+        ...(mediaArray ? { media: mediaArray } : {}),
+      },
+    },
+    visibility: { 'com.linkedin.ugc.MemberNetworkVisibility': 'PUBLIC' },
+  });
+  const r = await httpreq({
+    hostname: 'api.linkedin.com', path: '/v2/ugcPosts', method: 'POST',
+    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json', 'X-Restli-Protocol-Version': '2.0.0', 'Content-Length': Buffer.byteLength(postBody) },
+  }, postBody);
+  if (r.status >= 400) throw new Error(`LinkedIn post: ${r.raw.slice(0, 300)}`);
+  return String(r.headers['x-restli-id'] || r.body?.id || '');
+}
+
+// ── Facebook ──────────────────────────────────────────────────────────────────
+async function postFacebook(text, imageUrl) {
+  const pageId = process.env.FACEBOOK_PAGE_ID;
+  const token  = process.env.FACEBOOK_PAGE_ACCESS_TOKEN;
+  if (!pageId || !token) throw new Error('FACEBOOK_PAGE_ID / FACEBOOK_PAGE_ACCESS_TOKEN not set');
+
+  const path   = imageUrl ? `/v19.0/${pageId}/photos` : `/v19.0/${pageId}/feed`;
+  const bodyObj = imageUrl
+    ? { caption: text, url: imageUrl, access_token: token }
+    : { message: text, access_token: token };
+  const b = JSON.stringify(bodyObj);
+  const r = await httpreq({
+    hostname: 'graph.facebook.com', path, method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(b) },
+  }, b);
+  if (r.status >= 400) throw new Error(`Facebook post: ${r.raw.slice(0, 300)}`);
+  return String(r.body?.post_id || r.body?.id || '');
+}
+
+// ── Instagram ─────────────────────────────────────────────────────────────────
+async function postInstagram(caption, imageUrl) {
+  const igId  = process.env.INSTAGRAM_BUSINESS_ACCOUNT_ID;
+  const token = process.env.FACEBOOK_PAGE_ACCESS_TOKEN;
+  if (!igId || !token) throw new Error('INSTAGRAM_BUSINESS_ACCOUNT_ID / FACEBOOK_PAGE_ACCESS_TOKEN not set');
+  if (!imageUrl) { console.log('   Instagram skipped (이미지 없음 — 필수)'); return null; }
+
+  // Step 1: Create media container
+  const cb = JSON.stringify({ image_url: imageUrl, caption, access_token: token });
+  const cr = await httpreq({
+    hostname: 'graph.facebook.com', path: `/v19.0/${igId}/media`, method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(cb) },
+  }, cb);
+  if (cr.status >= 400) throw new Error(`Instagram media create: ${cr.raw.slice(0, 300)}`);
+  const containerId = cr.body.id;
+  console.log(`   container: ${containerId}`);
+  await sleep(2000);
+
+  // Step 2: Publish
+  const pb = JSON.stringify({ creation_id: containerId, access_token: token });
+  const pr = await httpreq({
+    hostname: 'graph.facebook.com', path: `/v19.0/${igId}/media_publish`, method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(pb) },
+  }, pb);
+  if (pr.status >= 400) throw new Error(`Instagram publish: ${pr.raw.slice(0, 300)}`);
+  return String(pr.body?.id || '');
+}
+
 // ── 메인 ──────────────────────────────────────────────────────────────────────
 async function main() {
   console.log(`\n🚀 Verse8 Publisher — ${PAGE_ID}`);
@@ -324,7 +434,7 @@ async function main() {
 
   // 1. Notion 페이지 가져오기
   console.log('📄 Fetching page...');
-  const { id, title, status, tweetContents, discordContent } = await fetchPage(PAGE_ID);
+  const { id, title, status, tweetContents, discordContent, instagramContent, facebookContent, linkedinContent } = await fetchPage(PAGE_ID);
   console.log(`   "${title}" | Status: ${status}`);
 
   if (status !== 'READY') {
@@ -387,29 +497,96 @@ async function main() {
     await slackPost(process.env.SLACK_NOTIFICATION_CHANNEL, `⚠️ 발행 오류 [Discord]: ${title}\n${e.message}`);
   }
 
-  // 4. Notion → LIVE
+  // 4. LinkedIn
+  let linkedinPostId = null;
+  if (linkedinContent?.text && process.env.LINKEDIN_ACCESS_TOKEN) {
+    console.log('\n💼 LinkedIn...');
+    try {
+      let imageTmp = null;
+      if (linkedinContent.mediaUrl && linkedinContent.mediaType === 'image') {
+        imageTmp = `/tmp/v8li_${Date.now()}`;
+        tmpFiles.push(imageTmp);
+        await download(linkedinContent.mediaUrl, imageTmp);
+      }
+      linkedinPostId = await postLinkedIn(linkedinContent.text, imageTmp);
+      console.log(`   posted ✅ ${linkedinPostId}`);
+    } catch (e) {
+      console.error(`❌ LinkedIn: ${e.message}`);
+      await slackPost(process.env.SLACK_NOTIFICATION_CHANNEL, `⚠️ 발행 오류 [LinkedIn]: ${title}\n${e.message}`);
+    }
+  } else if (linkedinContent?.text) {
+    console.log('\n💼 LinkedIn skipped (LINKEDIN_ACCESS_TOKEN not set)');
+  }
+
+  // 5. Facebook
+  let facebookPostId = null;
+  if (facebookContent?.text && process.env.FACEBOOK_PAGE_ACCESS_TOKEN) {
+    console.log('\n📘 Facebook...');
+    try {
+      const imageUrl = facebookContent.mediaUrl || null;
+      facebookPostId = await postFacebook(facebookContent.text, imageUrl);
+      console.log(`   posted ✅ ${facebookPostId}`);
+    } catch (e) {
+      console.error(`❌ Facebook: ${e.message}`);
+      await slackPost(process.env.SLACK_NOTIFICATION_CHANNEL, `⚠️ 발행 오류 [Facebook]: ${title}\n${e.message}`);
+    }
+  } else if (facebookContent?.text) {
+    console.log('\n📘 Facebook skipped (FACEBOOK_PAGE_ACCESS_TOKEN not set)');
+  }
+
+  // 6. Instagram
+  let instagramMediaId = null;
+  if (instagramContent?.text && process.env.INSTAGRAM_BUSINESS_ACCOUNT_ID) {
+    console.log('\n📸 Instagram...');
+    try {
+      const imageUrl = instagramContent.mediaUrl || null;
+      instagramMediaId = await postInstagram(instagramContent.text, imageUrl);
+      if (instagramMediaId) console.log(`   posted ✅ ${instagramMediaId}`);
+    } catch (e) {
+      console.error(`❌ Instagram: ${e.message}`);
+      await slackPost(process.env.SLACK_NOTIFICATION_CHANNEL, `⚠️ 발행 오류 [Instagram]: ${title}\n${e.message}`);
+    }
+  } else if (instagramContent?.text) {
+    console.log('\n📸 Instagram skipped (INSTAGRAM_BUSINESS_ACCOUNT_ID not set)');
+  }
+
+  // 7. Notion → LIVE
   console.log('\n📋 Notion → LIVE...');
   await notionPatch(`/v1/pages/${id}`, { properties: { Status: { status: { name: 'LIVE' } } } });
   console.log('   updated ✅');
 
-  // 5. scheduled-publishes.json 업데이트
+  // 8. scheduled-publishes.json 업데이트
   const schedPath = path.resolve(__dirname, '../scheduled-publishes.json');
   if (fs.existsSync(schedPath)) {
     try {
       const sched = JSON.parse(fs.readFileSync(schedPath, 'utf8'));
       const entry = sched.schedules.find(s => s.pageId.replace(/-/g,'') === PAGE_ID.replace(/-/g,''));
-      if (entry) { entry.status = 'published'; entry.publishedAt = new Date().toISOString(); entry.twitterUrl = twitterUrl; entry.analyticsStatus = 'pending'; }
+      if (entry) {
+        entry.status = 'published';
+        entry.publishedAt = new Date().toISOString();
+        entry.twitterUrl = twitterUrl;
+        if (linkedinPostId)   entry.linkedinPostId   = linkedinPostId;
+        if (facebookPostId)   entry.facebookPostId   = facebookPostId;
+        if (instagramMediaId) entry.instagramMediaId = instagramMediaId;
+        entry.analyticsStatus = 'pending';
+      }
       fs.writeFileSync(schedPath, JSON.stringify(sched, null, 2));
     } catch (e) { console.warn('scheduled-publishes.json update skipped:', e.message); }
   }
 
-  // 6. Slack 팀 알림
+  // 9. Slack 팀 알림
   const kst = new Date(Date.now() + 9*3600000).toISOString().replace('T',' ').slice(0,16) + ' KST';
+  const publishedChannels = [
+    twitterUrl       ? `🐦 Twitter: ${twitterUrl}` : null,
+    discordContent?.text ? `💬 Discord: #major-announcement` : null,
+    linkedinPostId   ? `💼 LinkedIn: 게시 완료` : null,
+    facebookPostId   ? `📘 Facebook: 게시 완료` : null,
+    instagramMediaId ? `📸 Instagram: 게시 완료` : null,
+  ].filter(Boolean);
   await slackPost(process.env.SLACK_TEAM_CHANNEL, [
     `🚀 *${title}* 발행 완료!`,
     '',
-    twitterUrl ? `🐦 ${twitterUrl}` : '🐦 Twitter: (URL 없음)',
-    `💬 Discord: #major-announcement`,
+    ...publishedChannels,
     `⏰ ${kst}`,
     '',
     `⚡ *First Hour Actions:*`,
