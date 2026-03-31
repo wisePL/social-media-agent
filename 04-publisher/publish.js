@@ -425,18 +425,33 @@ async function postLinkedIn(text, imageFilePath) {
 }
 
 // ── Facebook ──────────────────────────────────────────────────────────────────
+// 시스템 유저 토큰 → Page Access Token 자동 교환
+async function getFacebookPageToken(pageId, token) {
+  const r = await httpreq({
+    hostname: 'graph.facebook.com',
+    path: `/v19.0/${pageId}?fields=access_token`,
+    method: 'GET',
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (r.status >= 400 || !r.body?.access_token) return token; // 교환 실패 시 원본 사용
+  return r.body.access_token;
+}
+
 async function postFacebook(text, imageUrl) {
   const pageId = process.env.FACEBOOK_PAGE_ID;
-  const token  = process.env.FACEBOOK_PAGE_ACCESS_TOKEN;
-  if (!pageId || !token) throw new Error('FACEBOOK_PAGE_ID / FACEBOOK_PAGE_ACCESS_TOKEN not set');
+  const rawToken = process.env.FACEBOOK_PAGE_ACCESS_TOKEN;
+  if (!pageId || !rawToken) throw new Error('FACEBOOK_PAGE_ID / FACEBOOK_PAGE_ACCESS_TOKEN not set');
 
-  const path   = imageUrl ? `/v19.0/${pageId}/photos` : `/v19.0/${pageId}/feed`;
+  // 시스템 유저 토큰인 경우 Page Access Token으로 교환
+  const token = await getFacebookPageToken(pageId, rawToken);
+
+  const p     = imageUrl ? `/v19.0/${pageId}/photos` : `/v19.0/${pageId}/feed`;
   const bodyObj = imageUrl
     ? { caption: text, url: imageUrl, access_token: token }
     : { message: text, access_token: token };
   const b = JSON.stringify(bodyObj);
   const r = await httpreq({
-    hostname: 'graph.facebook.com', path, method: 'POST',
+    hostname: 'graph.facebook.com', path: p, method: 'POST',
     headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(b) },
   }, b);
   if (r.status >= 400) throw new Error(`Facebook post: ${r.raw.slice(0, 300)}`);
@@ -445,9 +460,11 @@ async function postFacebook(text, imageUrl) {
 
 // ── Instagram ─────────────────────────────────────────────────────────────────
 async function postInstagram(caption, imageUrl) {
-  const igId  = process.env.INSTAGRAM_BUSINESS_ACCOUNT_ID;
-  const token = process.env.FACEBOOK_PAGE_ACCESS_TOKEN;
-  if (!igId || !token) throw new Error('INSTAGRAM_BUSINESS_ACCOUNT_ID / FACEBOOK_PAGE_ACCESS_TOKEN not set');
+  const igId    = process.env.INSTAGRAM_BUSINESS_ACCOUNT_ID;
+  const rawToken = process.env.FACEBOOK_PAGE_ACCESS_TOKEN;
+  if (!igId || !rawToken) throw new Error('INSTAGRAM_BUSINESS_ACCOUNT_ID / FACEBOOK_PAGE_ACCESS_TOKEN not set');
+  // 시스템 유저 토큰인 경우 Page Access Token으로 교환
+  const token = await getFacebookPageToken(process.env.FACEBOOK_PAGE_ID, rawToken);
   if (!imageUrl) { console.log('   Instagram skipped (이미지 없음 — 필수)'); return null; }
 
   // Step 1: Create media container
