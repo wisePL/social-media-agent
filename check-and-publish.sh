@@ -12,7 +12,7 @@ echo "[$(date '+%Y-%m-%d %H:%M:%S')] check-and-publish start"
 
 # .env 에서 NOTION_TOKEN 읽기
 NOTION_TOKEN=$(grep '^NOTION_TOKEN=' "$DIR/.env" | cut -d'=' -f2- | tr -d '[:space:]')
-NOTION_CALENDAR_DB="2bfed889-905f-8105-9313-000bb0f90cb5"
+NOTION_CALENDAR_DB="2bfed889-905f-815f-8954-dfec194f8a2c"
 
 if [ -z "$NOTION_TOKEN" ]; then
   echo "[$(date '+%Y-%m-%d %H:%M:%S')] ❌ NOTION_TOKEN not found in .env"
