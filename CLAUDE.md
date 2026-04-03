@@ -24,6 +24,7 @@ ORCHESTRATOR.md              ← 전체 파이프라인 진입점
 NOTION_DATASOURCE_ID   = "2bfed889-905f-8105-9313-000bb0f90cb5"
 NOTION_TEMPLATE_ID     = "2bfed889-905f-8100-af78-c527d8069f47"
 NOTION_CALENDAR_DB     = "https://www.notion.so/2bfed889905f815f8954dfec194f8a2c"
+NOTION_CALENDAR_DB_ID  = "2bfed889-905f-815f-8954-dfec194f8a2c"  ← API query 용
 NOTION_DASHBOARD_PAGE  = "https://www.notion.so/326ed889905f8113aed3e45747acc14a"
 TWITTER_HANDLE         = "@Verse_Eight"
 DISCORD_SERVER         = "discord.gg/verse8-official"
@@ -47,11 +48,47 @@ SLACK_TEAM_CHANNEL     = "C09FWFU4ZQB"  ← 팀 공유 채널 (주간 리포트 
 
 ## 자동화 인프라 (GCP VM: verse8-agent, us-central1-a)
 ```
-00-comment-watcher  → cron */5 * * * *  (댓글 커맨드 감지 + 실행)
-git pull            → cron */10 * * * * (코드 최신화)
-05-analytics        → 로컬 실행 (수동 또는 /announce-analytics)
+00-comment-watcher           → 7,37 * * * *  (30분마다 댓글 커맨드 감지)
+check-and-publish.sh         → */30 * * * *  (예약 발행 체크)
+check-and-analyze.sh post    → */30 * * * *  (발행 24h 후 포스트 분석)
+weekly analytics report      → 0 0 * * 1     (매주 월 09:00 KST)
+monthly Few-Shot update      → 0 1 1 * *     (매월 1일 10:00 KST)
+git pull                     → */10 * * * *  (코드 최신화)
 ```
-> 로컬 Claude Code를 켜지 않아도 @start, @copy, @publish 등 노션 댓글 커맨드는 자동 처리됩니다.
+> ⚠️ `create_scheduled_task` MCP 절대 사용 금지 — 세션 종료 시 태스크 소멸
+> 로컬 Claude Code를 켜지 않아도 /start, /copy, /publish 등 노션 댓글 커맨드는 자동 처리됩니다.
+
+## 노션 커맨드 규칙
+- 모든 커맨드는 `/`으로 시작 (예: `/copy`, `/publish`, `/start`)
+- `@`는 사용하지 않음 — 노션 멘션과 충돌
+- BOT 회신 식별: `✅ [BOT]`, `⏳ [BOT]`, `⛔ [BOT]`, `❓ [BOT]` 로 시작
+
+## 노션 페이지 Callout 포맷 규칙
+**Callout 안에는 실제 카피(copy)만 작성. 가이드 문구 절대 넣지 않음.**
+
+```
+📋 Task Details    ← 공지 배경/목적/핵심 메시지 (사람이 작성)
+🐦 Tweet (Web3)    ← AI가 트위터 카피 작성
+📱 Instagram       ← AI가 인스타 카피 작성
+👥 Facebook        ← AI가 페이스북 카피 작성
+💼 LinkedIn        ← AI가 링크드인 카피 작성
+💬 Discord         ← AI가 디스코드 카피 작성
+🎨 Graphic Request ← AI가 디자이너용 브리프 작성
+🖼️ Design Output   ← 디자이너가 완성 파일 링크 첨부
+```
+
+- **Tweet 2 (`🐦 Tweet 2`)는 AI가 스레드가 필요하다고 판단할 때만 추가** — 템플릿에 고정 슬롯 없음
+- 각 callout 안의 paragraph는 송출할 copy만 (설명/가이드 문구 포함 금지)
+- publish.js가 다음 패턴을 자동 필터링(스킵)하므로 Notion에도 넣지 말 것:
+  - `← 카피를`, `카피를 여기에`, `Web3 degen 타겟 |`, `해시태그 금지`
+  - `link in bio CTA`, `마크다운 활용`, `캐주얼 톤 |`, `전문적 톤 |`
+  - `설명형 1-3문단`, `데이터·트랙션 중심`
+
+## 자동 발행 조건 (check-and-publish.sh)
+- Status = `READY` **AND** Date 필드에 **날짜+시간** 모두 설정된 경우만 발행
+- **날짜만 있는 경우 (예: `2026-04-07`) → READY여도 자동 발행 안 함**
+- 발행 window: 예약 시간 기준 ±35분 이내만 처리
+- 과거 페이지 재발행 방지: window를 벗어난 경우 스킵
 
 ## 환경 변수 (.env 파일 위치: 이 폴더)
 ```
@@ -67,4 +104,5 @@ SLACK_USER_ID              ← 알림 수신자 User ID (개인 DM)
 SLACK_NOTIFICATION_CHANNEL ← 개인 DM 채널 (파이프라인 오류 알림)
 SLACK_TEAM_CHANNEL         ← 팀 공유 채널 (발행 완료 + 주간 리포트)
 NOTION_DASHBOARD_PAGE_ID   ← Marketing Ops Dashboard 페이지 ID
+FACEBOOK_PAGE_ACCESS_TOKEN ← Meta 시스템 유저 영구 토큰 (자동으로 Page token 교환)
 ```
