@@ -171,6 +171,20 @@ async function fetchPage(pageId) {
     let mediaUrl = null;
     let mediaType = null;
 
+    // 노션 템플릿 가이드 문구 패턴 (실제 copy가 아닌 지시 텍스트)
+    const GUIDE_PATTERNS = [
+      /← 카피를/,
+      /카피를 여기에/,
+      /타겟\s*\|.*자↓/,
+      /해시태그 금지/,
+      /link in bio/i,
+      /마크다운 활용/,
+      /선택사항\)/,
+      /^Web3 degen 타겟/,
+      /설명형 1-3문단/,
+      /데이터·트랙션 중심/,
+    ];
+
     for (const c of childBlocks) {
       if (c.type === 'paragraph') {
         const t = (c.paragraph?.rich_text || []).map(r => {
@@ -178,7 +192,10 @@ async function fetchPage(pageId) {
           if (r.href) return r.href;
           return r.plain_text || '';
         }).join('');
-        if (t.trim()) text += (text ? '\n' : '') + t.trim();
+        const trimmed = t.trim();
+        // 가이드/지시 문구는 스킵
+        if (!trimmed || GUIDE_PATTERNS.some(p => p.test(trimmed))) continue;
+        text += (text ? '\n' : '') + trimmed;
       }
       if (c.type === 'image') {
         mediaUrl = c.image?.file?.url || c.image?.external?.url;

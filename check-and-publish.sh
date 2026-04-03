@@ -50,13 +50,16 @@ function notionPost(p, body) {
 }
 
 async function main() {
-  const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+  const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD (UTC)
+  // KST(UTC+9) 기준 오늘 날짜도 커버 (최대 어제까지)
+  const yesterday = new Date(Date.now() - 24 * 3600 * 1000).toISOString().slice(0, 10);
 
-  // READY 상태이고 날짜가 오늘 이하인 페이지 조회
+  // READY 상태이고 날짜가 오늘인 페이지만 조회 (과거 누적 발행 방지)
   const res = await notionPost(`/v1/databases/${dbId}/query`, {
     filter: {
       and: [
         { property: 'Status', status: { equals: 'READY' } },
+        { property: 'Date', date: { on_or_after: yesterday } },
         { property: 'Date', date: { on_or_before: today } },
       ]
     }
