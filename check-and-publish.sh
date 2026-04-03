@@ -50,7 +50,7 @@ function notionPost(p, body) {
 }
 
 async function main() {
-  const now = Date.now();
+  const nowMs = Date.now();
   const WINDOW_MS = 35 * 60 * 1000; // 30분 크론 + 5분 여유
 
   // READY 상태 페이지 전체 조회 (날짜+시간 필터는 JS에서 정밀 처리)
@@ -80,7 +80,7 @@ async function main() {
 
     // ② 발행 시간이 지금으로부터 WINDOW_MS 이내인 경우만 발행
     const publishAt = new Date(dateObj.start).getTime();
-    const diff = now - publishAt;
+    const diff = nowMs - publishAt;
     if (diff < 0) {
       console.log(`[${new Date().toISOString()}] ⏭ Skipped (not yet): "${(page.properties?.Name?.title||[]).map(t=>t.plain_text).join('')}" → ${dateObj.start}`);
       continue;
