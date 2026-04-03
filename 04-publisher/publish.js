@@ -177,12 +177,14 @@ async function fetchPage(pageId) {
       /카피를 여기에/,
       /타겟\s*\|.*자↓/,
       /해시태그 금지/,
-      /link in bio/i,
+      /link in bio CTA/i,
       /마크다운 활용/,
       /선택사항\)/,
       /^Web3 degen 타겟/,
       /설명형 1-3문단/,
       /데이터·트랙션 중심/,
+      /캐주얼 톤\s*\|/,
+      /전문적 톤\s*\|/,
     ];
 
     for (const c of childBlocks) {
