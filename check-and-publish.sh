@@ -50,28 +50,49 @@ function notionPost(p, body) {
 }
 
 async function main() {
-  const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD (UTC)
-  // KST(UTC+9) 기준 오늘 날짜도 커버 (최대 어제까지)
-  const yesterday = new Date(Date.now() - 24 * 3600 * 1000).toISOString().slice(0, 10);
+  const now = Date.now();
+  const WINDOW_MS = 35 * 60 * 1000; // 30분 크론 + 5분 여유
 
-  // READY 상태이고 날짜가 오늘인 페이지만 조회 (과거 누적 발행 방지)
+  // READY 상태 페이지 전체 조회 (날짜+시간 필터는 JS에서 정밀 처리)
   const res = await notionPost(`/v1/databases/${dbId}/query`, {
-    filter: {
-      and: [
-        { property: 'Status', status: { equals: 'READY' } },
-        { property: 'Date', date: { on_or_after: yesterday } },
-        { property: 'Date', date: { on_or_before: today } },
-      ]
-    }
+    filter: { property: 'Status', status: { equals: 'READY' } }
   });
 
   const pages = res.results || [];
-  console.log(`[${new Date().toISOString()}] READY pages found: ${pages.length}`);
+  console.log(`[${new Date().toISOString()}] READY pages total: ${pages.length}`);
 
   for (const page of pages) {
+    const dateObj = page.properties?.Date?.date;
+
+    // ① 날짜+시간이 모두 설정된 경우만 자동 발행 (날짜만 있으면 스킵)
+    if (!dateObj?.start) {
+      console.log(`[${new Date().toISOString()}] ⏭ Skipped (no date): "${(page.properties?.Name?.title||[]).map(t=>t.plain_text).join('')}"`);
+      continue;
+    }
+
+    // Notion date 필드: is_datetime 여부로 판단
+    // 날짜만 있으면 start = "2026-04-07" (T 없음), 시간 있으면 "2026-04-07T09:00:00.000Z"
+    const hasTime = dateObj.start.includes('T');
+    if (!hasTime) {
+      console.log(`[${new Date().toISOString()}] ⏭ Skipped (date only, no time): "${(page.properties?.Name?.title||[]).map(t=>t.plain_text).join('')}" → ${dateObj.start}`);
+      continue;
+    }
+
+    // ② 발행 시간이 지금으로부터 WINDOW_MS 이내인 경우만 발행
+    const publishAt = new Date(dateObj.start).getTime();
+    const diff = now - publishAt;
+    if (diff < 0) {
+      console.log(`[${new Date().toISOString()}] ⏭ Skipped (not yet): "${(page.properties?.Name?.title||[]).map(t=>t.plain_text).join('')}" → ${dateObj.start}`);
+      continue;
+    }
+    if (diff > WINDOW_MS) {
+      console.log(`[${new Date().toISOString()}] ⏭ Skipped (window passed): "${(page.properties?.Name?.title||[]).map(t=>t.plain_text).join('')}" → ${dateObj.start}`);
+      continue;
+    }
+
     const pageId = page.id.replace(/-/g, '');
     const title = (page.properties?.Name?.title || []).map(t => t.plain_text).join('') || pageId;
-    console.log(`[${new Date().toISOString()}] Publishing: "${title}" (${pageId})`);
+    console.log(`[${new Date().toISOString()}] Publishing: "${title}" @ ${dateObj.start}`);
 
     try {
       execSync(`node "${publishScript}" --page-id=${pageId}`, {
