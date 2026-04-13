@@ -287,11 +287,12 @@ async function uploadVideo(filePath) {
   const data = fs.readFileSync(filePath);
   const uploadUrl = 'https://upload.twitter.com/1.1/media/upload.json';
 
-  // INIT
-  const initBody = `command=INIT&total_bytes=${data.length}&media_type=video%2Fmp4&media_category=tweet_video`;
+  // INIT — body params must be included in OAuth signature for form-encoded requests
+  const initParams = { command: 'INIT', total_bytes: String(data.length), media_type: 'video/mp4', media_category: 'tweet_video' };
+  const initBody = Object.entries(initParams).map(([k,v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`).join('&');
   const initR = await httpreq({
     hostname: 'upload.twitter.com', path: '/1.1/media/upload.json', method: 'POST',
-    headers: { Authorization: oauthHeader('POST', uploadUrl), 'Content-Type': 'application/x-www-form-urlencoded', 'Content-Length': Buffer.byteLength(initBody) },
+    headers: { Authorization: oauthHeader('POST', uploadUrl, initParams), 'Content-Type': 'application/x-www-form-urlencoded', 'Content-Length': Buffer.byteLength(initBody) },
   }, initBody);
   if (initR.status >= 400) throw new Error(`Video INIT: ${initR.raw.slice(0,300)}`);
   const mediaId = initR.body.media_id_string;
@@ -314,11 +315,12 @@ async function uploadVideo(filePath) {
     console.log(`  chunk ${seg+1} uploaded`);
   }
 
-  // FINALIZE
-  const finBody = `command=FINALIZE&media_id=${mediaId}`;
+  // FINALIZE — body params must be included in OAuth signature for form-encoded requests
+  const finParams = { command: 'FINALIZE', media_id: mediaId };
+  const finBody = Object.entries(finParams).map(([k,v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`).join('&');
   const finR = await httpreq({
     hostname: 'upload.twitter.com', path: '/1.1/media/upload.json', method: 'POST',
-    headers: { Authorization: oauthHeader('POST', uploadUrl), 'Content-Type': 'application/x-www-form-urlencoded', 'Content-Length': Buffer.byteLength(finBody) },
+    headers: { Authorization: oauthHeader('POST', uploadUrl, finParams), 'Content-Type': 'application/x-www-form-urlencoded', 'Content-Length': Buffer.byteLength(finBody) },
   }, finBody);
   if (finR.status >= 400) throw new Error(`Video FINALIZE: ${finR.raw.slice(0,300)}`);
 
@@ -523,6 +525,14 @@ async function main() {
 
   if (status !== 'READY') {
     console.error(`❌ Status is "${status}" (READY 필요)`);
+    process.exit(1);
+  }
+
+  // 콘텐츠 없으면 발행하지 않고 종료 (Notion LIVE 마킹 방지)
+  const hasContent = tweetContents.length > 0 || discordContent?.text || instagramContent?.text || facebookContent?.text || linkedinContent?.text;
+  if (!hasContent) {
+    console.error(`❌ No publishable content found in page "${title}". Aborting — Notion status NOT changed.`);
+    await slackPost(process.env.SLACK_NOTIFICATION_CHANNEL, `⚠️ 발행 콘텐츠 없음: "${title}"\n노션 페이지 본문에 카피가 없습니다. READY 상태 유지.`);
     process.exit(1);
   }
 
